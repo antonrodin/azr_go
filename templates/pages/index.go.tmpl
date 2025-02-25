@@ -1,0 +1,15 @@
+{{ template "app" . }}
+
+{{ define "content" }}
+    <h1>Pages List</h1>
+    {{range .Pages}}
+        <article>
+            <h1>{{unescaped .Title}}</h1>
+            <h2>Published {{.Published}}</h2>
+            <a href="/pages/{{.Slug}}">Link to article</a>
+            <div>
+                {{ unescaped .Content}}
+            </div>
+        </article>
+    {{end}}
+{{end}}

@@ -1,0 +1,12 @@
+{{ template "app" . }}
+
+{{ define "content" }}
+<h1>{{ .Title }}</h1>
+<p>
+    Updated At {{.UpdatedAt.Format "2006-01-02 15:04"}}
+</p>
+<div>{{ unescaped .Content }}</div>
+
+<a href="/pages">Volver</a>
+<a href="/pages/{{.Slug}}/edit">Editar</a>
+{{ end }}

@@ -1,0 +1,33 @@
+{{ template "app" . }}
+
+{{ define "metadata"}}
+<title>Anton Zekeriev Rodin</title>
+<meta name="description" content="Anton Zekeriev Rodin" />
+<meta name="robots" content="all" />
+
+<!-- <meta property="og:url" content="" /> -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Anton Zekeriev Rodin" />
+<meta property="og:description" content="Anton Zekeriev Rodin" />
+<meta property="og:image" content="/public/img/azr.jpg" />
+{{ end }}
+
+{{ define "content" }}
+
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-body-emphasis">Antón Zekeriev Rodin</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">Actualmente la web se encuentra en construcción. Puedes contactar conmigo a traves del
+            correo <a href="mailto:azr@azr.es">azr@azr.es</a> o a través del
+            telefono +34 675 649 322. Tambien me puedes encontrar aquí:</p>
+
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="https://github.com/antonrodin" class="btn btn-outline-secondary btn-sm px-4 gap-3">Github</a>
+            <a href="https://www.youtube.com/c/AZRMedia" class="btn btn-outline-secondary btn-sm px-4">Youtube</a>
+            <a href="https://www.linkedin.com/in/azrodin/" class="btn btn-outline-secondary btn-sm px-4">Linkedit</a>
+            <a href="https://www.azrodin.com/" class="btn btn-outline-secondary btn-sm px-4">Blog</a>
+        </div>
+    </div>
+</div>
+
+{{ end }}

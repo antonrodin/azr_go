@@ -1,0 +1,32 @@
+{{ template "app" . }}
+
+{{ define "content" }}
+<h1>Edit: {{ .Title }}</h1>
+
+<form method="post" action="/pages/{{.Slug}}">
+    <div>
+        <label for="title">Title</label>
+        <input type="text" name="title" value="{{.Title}}">
+    </div>
+
+    <div>
+        <label for="slug">Slug</label>
+        <input type="text" name="slug" value="{{.Slug}}">
+    </div>
+
+    <div>
+        <label for="published">Published</label>
+        <input type="text" name="published" value="{{.Published}}">
+    </div>
+
+    <div>
+        <label for="slug">Content</label>
+        <textarea name="content" cols="30" rows="30">{{.Content}}</textarea>
+    </div>
+
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+
+</form>
+{{ end }}
