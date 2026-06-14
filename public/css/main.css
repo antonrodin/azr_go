@@ -103,6 +103,25 @@ a:hover {
     font-size: 1rem;
 }
 
+/* Selector de idioma */
+.langs {
+    margin-top: 1.75rem;
+    display: flex;
+    gap: 1rem;
+    font-size: .85rem;
+    letter-spacing: .08em;
+}
+
+.langs a {
+    text-decoration: none;
+    color: var(--muted);
+}
+
+.langs a.active {
+    color: var(--ink);
+    font-weight: 700;
+}
+
 /* Columna skills */
 .skills h2 {
     font-size: .8rem;

@@ -14,7 +14,8 @@ func (app *app) routes() http.Handler {
 	router.Use(LoadSession)
 
 	// Rutes
-	router.Get("/", handlers.App.Home)
+	router.Get("/", handlers.App.Home)        // español por defecto
+	router.Get("/{lang}", handlers.App.Home)  // /es, /en, /ru
 
 	// Static files
 	fileServer := http.FileServer(http.Dir("./public/"))

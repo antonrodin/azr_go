@@ -1,14 +1,20 @@
 {{ template "app" . }}
 
 {{ define "metadata"}}
-<title>Antón Zekeriev Rodin — Ingeniero del Software</title>
-<meta name="description" content="Antón Zekeriev Rodin. Padre, ingeniero del software. Hago cosas que funcionan. Go, TypeScript, JavaScript, PHP y lo que haga falta." />
+<title>{{ .MetaTitle }}</title>
+<meta name="description" content="{{ .MetaDescription }}" />
 <meta name="robots" content="all" />
 
-<meta property="og:url" content="https://azr.es/" />
+<link rel="canonical" href="https://azr.es{{ .Path }}" />
+<link rel="alternate" hreflang="es" href="https://azr.es/" />
+<link rel="alternate" hreflang="en" href="https://azr.es/en" />
+<link rel="alternate" hreflang="ru" href="https://azr.es/ru" />
+<link rel="alternate" hreflang="x-default" href="https://azr.es/" />
+
+<meta property="og:url" content="https://azr.es{{ .Path }}" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Antón Zekeriev Rodin — Ingeniero del Software" />
-<meta property="og:description" content="Padre. Ingeniero del software. Hago cosas que funcionan." />
+<meta property="og:title" content="{{ .OgTitle }}" />
+<meta property="og:description" content="{{ .OgDescription }}" />
 <meta property="og:image" content="/public/img/azr.jpg" />
 {{ end }}
 
@@ -26,10 +32,10 @@
             </picture>
             <h1>Antón Zekeriev Rodin</h1>
             <ul class="claims">
-                <li>Padre.</li>
-                <li>Ingeniero del Software.</li>
-                <li>Ingeniero de IA <span class="aside">(esta web está vibecodeada, así que cuenta)</span>.</li>
-                <li>Hago cosas que funcionan <span class="aside">(la mayoría de las veces)</span>.</li>
+                <li>{{ .ClaimFather }}</li>
+                <li>{{ .ClaimSWE }}</li>
+                <li>{{ .ClaimAI }} <span class="aside">{{ .ClaimAIAside }}</span>.</li>
+                <li>{{ .ClaimWorks }} <span class="aside">{{ .ClaimWorksAside }}</span>.</li>
             </ul>
             <ul class="social">
                 <li><a href="https://github.com/antonrodin" target="_blank" rel="noopener">GitHub</a></li>
@@ -38,55 +44,54 @@
                 <li><a href="https://www.azrodin.com/" target="_blank" rel="noopener">Blog</a></li>
                 <li><a href="mailto:azr@azr.es">azr@azr.es</a></li>
             </ul>
+            <nav class="langs" aria-label="Idioma">
+                <a href="/" {{ if eq .Lang "es" }}class="active" aria-current="true"{{ end }}>ES</a>
+                <a href="/en" {{ if eq .Lang "en" }}class="active" aria-current="true"{{ end }}>EN</a>
+                <a href="/ru" {{ if eq .Lang "ru" }}class="active" aria-current="true"{{ end }}>RU</a>
+            </nav>
         </aside>
 
         <!-- Columna 2: Skills -->
         <section class="skills">
-            <h2>Skills</h2>
-            <p class="lead-note">Por orden de importancia. Spoiler: la primera es la única que de verdad cuenta.</p>
+            <h2>{{ .SkillsHeading }}</h2>
+            <p class="lead-note">{{ .SkillsNote }}</p>
 
             <div class="skill">
-                <h3>Skill nº 1 <span class="aside">— la importante</span></h3>
-                <p>Capacidad de aprender y adaptarme a cualquier cosa. Aprendo hoy lo que me hará
-                   falta mañana. Las demás de esta lista son, básicamente, esta misma aplicada.</p>
+                <h3>{{ .Skill1Title }} <span class="aside">{{ .Skill1Aside }}</span></h3>
+                <p>{{ .Skill1Body }}</p>
             </div>
 
             <div class="skill">
-                <h3>Backend</h3>
-                <p>Go, TypeScript, JavaScript, PHP… lo que haga falta.</p>
+                <h3>{{ .BackendTitle }}</h3>
+                <p>{{ .BackendBody }}</p>
             </div>
 
             <div class="skill">
-                <h3>DevOps</h3>
-                <p>Kubernetes, Prometheus, Nginx, AWS… he usado un poco de todo
-                   <span class="aside">(lo justo para romper producción con conocimiento de causa)</span>.</p>
+                <h3>{{ .DevOpsTitle }}</h3>
+                <p>{{ .DevOpsBody }} <span class="aside">{{ .DevOpsAside }}</span>.</p>
             </div>
 
             <div class="skill">
-                <h3>Frontend</h3>
-                <p>HTML, CSS, BEM, Tailwind, Vue, React Native… etc.</p>
+                <h3>{{ .FrontendTitle }}</h3>
+                <p>{{ .FrontendBody }}</p>
             </div>
 
             <div class="skill">
-                <h3>IA / Vibecoding</h3>
-                <p>Sí, soy Ingeniero de IA. ¿Pruebas? Esta misma web está vibecodeada de arriba
-                   abajo. Yo pongo el criterio; la IA, la mecanografía
-                   <span class="aside">(y alguna que otra broma)</span>.</p>
+                <h3>{{ .AITitle }}</h3>
+                <p>{{ .AIBody }} <span class="aside">{{ .AIAside }}</span>.</p>
             </div>
 
             <div class="skill">
-                <h3>Otras tonterías</h3>
-                <p>Agile, MySQL, PostgreSQL, MongoDB, Jira, GitHub, Microservicios…
-                   <span class="aside">y los buzzwords que toquen ese trimestre</span>.</p>
+                <h3>{{ .OtherTitle }}</h3>
+                <p>{{ .OtherBody }} <span class="aside">{{ .OtherAside }}</span>.</p>
             </div>
         </section>
 
     </div>
 
     <p class="colophon">
-        Esta página está vibecodeada con
-        <a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a>.
-        Ni una línea escrita a mano, y mira qué legible ha quedado.
+        {{ .ColophonPre }}
+        <a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a>{{ .ColophonPost }}
     </p>
 </main>
 
