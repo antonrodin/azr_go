@@ -14,86 +14,57 @@
 
 {{ define "content" }}
 
-<div class="container py-5">
+<main class="page">
 
-    <!-- Hero -->
-    <section class="text-center py-5">
+    <header class="intro">
         <picture>
             <source srcset="/public/img/azr.webp" type="image/webp">
-            <img src="/public/img/azr.jpg" alt="Antón Zekeriev Rodin con su hijo"
-                 class="hero-photo mx-auto mb-4" width="1200" height="900">
+            <img src="/public/img/azr.jpg" alt="Antón Zekeriev Rodin" class="photo" width="1200" height="900">
         </picture>
-        <h1 class="display-5 fw-bold mb-2">Antón Zekeriev Rodin</h1>
-        <p class="lead text-secondary mb-4">
-            Desarrollador de software · ~20 años construyendo productos que siguen vivos
-        </p>
-        <div class="d-flex flex-wrap gap-2 justify-content-center">
-            <span class="badge rounded-pill text-bg-secondary">JavaScript</span>
-            <span class="badge rounded-pill text-bg-secondary">TypeScript</span>
-            <span class="badge rounded-pill text-bg-secondary">PHP</span>
-            <span class="badge rounded-pill text-bg-secondary">Go</span>
-            <span class="badge rounded-pill text-bg-secondary">SQL</span>
-        </div>
-    </section>
+        <h1>Antón Zekeriev Rodin</h1>
+        <p class="tagline">Desarrollador de software · ~20 años construyendo productos que siguen vivos</p>
+    </header>
 
-    <!-- Sobre mí -->
-    <section class="col-lg-7 mx-auto text-center py-4">
-        <p class="fs-5 text-body-secondary">
+    <section class="bio">
+        <p>
             Soy desarrollador full-stack y padre. Lo que más me enorgullece no es la cantidad
-            de código que he escrito, sino que <strong class="text-body">lo que construyo sigue
-            funcionando años después</strong>. Me gusta el código limpio, resolver problemas
-            (sí, también por gusto en LeetCode) y usar la IA como multiplicador para centrarme
-            en lo que importa: el producto y quien lo usa.
+            de código que he escrito, sino que <strong>lo que construyo sigue funcionando años
+            después</strong>. Me gusta el código limpio, resolver problemas (sí, también por
+            gusto en LeetCode) y usar la IA como multiplicador para centrarme en lo que importa:
+            el producto y quien lo usa.
         </p>
+        <p class="stack">JavaScript · TypeScript · PHP · Go · SQL</p>
     </section>
 
-    <!-- Proyectos -->
-    <section class="py-4">
-        <h2 class="h5 text-center text-secondary text-uppercase mb-4" style="letter-spacing:.1em">Proyectos</h2>
-        <div class="row g-3 justify-content-center">
-            <div class="col-md-5">
-                <a href="https://www.jacksonlive.es" class="text-decoration-none" target="_blank" rel="noopener">
-                    <div class="card project-card h-100">
-                        <div class="card-body">
-                            <h3 class="h5 card-title mb-1">JacksonLive</h3>
-                            <p class="card-text text-secondary mb-0">Agenda de conciertos y música en directo.</p>
-                            <small class="text-body-secondary">jacksonlive.es</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-5">
-                <a href="https://www.renovarcarnet.com" class="text-decoration-none" target="_blank" rel="noopener">
-                    <div class="card project-card h-100">
-                        <div class="card-body">
-                            <h3 class="h5 card-title mb-1">RenovarCarnet</h3>
-                            <p class="card-text text-secondary mb-0">Información y trámites para renovar el carnet.</p>
-                            <small class="text-body-secondary">renovarcarnet.com</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
+    <section class="block">
+        <h2>Proyectos</h2>
+        <ul class="projects">
+            <li>
+                <a href="https://www.jacksonlive.es" target="_blank" rel="noopener">JacksonLive</a>
+                <span>— Agenda de conciertos y música en directo.</span>
+            </li>
+            <li>
+                <a href="https://www.renovarcarnet.com" target="_blank" rel="noopener">RenovarCarnet</a>
+                <span>— Información y trámites para renovar el carnet.</span>
+            </li>
+        </ul>
     </section>
 
-    <!-- Enlaces -->
-    <section class="text-center py-4">
-        <div class="d-flex flex-wrap gap-2 justify-content-center">
-            <a href="https://github.com/antonrodin" class="btn btn-outline-light btn-sm px-4" target="_blank" rel="noopener">GitHub</a>
-            <a href="https://www.youtube.com/c/AZRMedia" class="btn btn-outline-light btn-sm px-4" target="_blank" rel="noopener">YouTube</a>
-            <a href="https://www.linkedin.com/in/azrodin/" class="btn btn-outline-light btn-sm px-4" target="_blank" rel="noopener">LinkedIn</a>
-            <a href="https://www.azrodin.com/" class="btn btn-outline-light btn-sm px-4" target="_blank" rel="noopener">Blog</a>
-        </div>
+    <section class="block">
+        <h2>Enlaces</h2>
+        <ul class="links">
+            <li><a href="https://github.com/antonrodin" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="https://www.youtube.com/c/AZRMedia" target="_blank" rel="noopener">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/in/azrodin/" target="_blank" rel="noopener">LinkedIn</a></li>
+            <li><a href="https://www.azrodin.com/" target="_blank" rel="noopener">Blog</a></li>
+        </ul>
     </section>
 
-    <!-- Contacto -->
-    <section class="text-center pt-4">
-        <p class="text-body-secondary mb-1">
-            ¿Hablamos? <a href="mailto:azr@azr.es" class="link-light">azr@azr.es</a>
-        </p>
-        <p class="text-secondary small mb-0">Música · pesca · y siempre algún proyecto entre manos.</p>
-    </section>
+    <footer class="foot">
+        <p><a href="mailto:azr@azr.es">azr@azr.es</a></p>
+        <p class="muted">Música · pesca · y siempre algún proyecto entre manos.</p>
+    </footer>
 
-</div>
+</main>
 
 {{ end }}
