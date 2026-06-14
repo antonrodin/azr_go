@@ -1,70 +1,79 @@
 {{ template "app" . }}
 
 {{ define "metadata"}}
-<title>Antón Zekeriev Rodin — Desarrollador de software</title>
-<meta name="description" content="Antón Zekeriev Rodin, desarrollador full-stack con ~20 años de experiencia. Creo y mantengo productos que siguen funcionando años después: JacksonLive, RenovarCarnet y más." />
+<title>Antón Zekeriev Rodin — Ingeniero del Software</title>
+<meta name="description" content="Antón Zekeriev Rodin. Padre, ingeniero del software. Hago cosas que funcionan. Go, TypeScript, JavaScript, PHP y lo que haga falta." />
 <meta name="robots" content="all" />
 
 <meta property="og:url" content="https://azr.es/" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Antón Zekeriev Rodin — Desarrollador de software" />
-<meta property="og:description" content="Desarrollador full-stack. Construyo productos que perduran. Go · TypeScript · PHP · SQL." />
+<meta property="og:title" content="Antón Zekeriev Rodin — Ingeniero del Software" />
+<meta property="og:description" content="Padre. Ingeniero del software. Hago cosas que funcionan." />
 <meta property="og:image" content="/public/img/azr.jpg" />
 {{ end }}
 
 {{ define "content" }}
 
 <main class="page">
+    <div class="grid">
 
-    <header class="intro">
-        <picture>
-            <source srcset="/public/img/azr.webp" type="image/webp">
-            <img src="/public/img/azr.jpg" alt="Antón Zekeriev Rodin" class="photo" width="1200" height="900">
-        </picture>
-        <h1>Antón Zekeriev Rodin</h1>
-        <p class="tagline">Desarrollador de software · ~20 años construyendo productos que siguen vivos</p>
-    </header>
+        <!-- Columna 1: Branding -->
+        <aside class="brand">
+            <div class="monogram">AZR</div>
+            <picture>
+                <source srcset="/public/img/azr.webp" type="image/webp">
+                <img src="/public/img/azr.jpg" alt="Antón Zekeriev Rodin" class="photo" width="1200" height="900">
+            </picture>
+            <h1>Antón Zekeriev Rodin</h1>
+            <ul class="claims">
+                <li>Padre.</li>
+                <li>Ingeniero del Software.</li>
+                <li>Hago cosas que funcionan <span class="aside">(la mayoría de las veces)</span>.</li>
+            </ul>
+            <ul class="social">
+                <li><a href="https://github.com/antonrodin" target="_blank" rel="noopener">GitHub</a></li>
+                <li><a href="https://www.youtube.com/c/AZRMedia" target="_blank" rel="noopener">YouTube</a></li>
+                <li><a href="https://www.linkedin.com/in/azrodin/" target="_blank" rel="noopener">LinkedIn</a></li>
+                <li><a href="https://www.azrodin.com/" target="_blank" rel="noopener">Blog</a></li>
+                <li><a href="mailto:azr@azr.es">azr@azr.es</a></li>
+            </ul>
+        </aside>
 
-    <section class="bio">
-        <p>
-            Soy desarrollador full-stack y padre. Lo que más me enorgullece no es la cantidad
-            de código que he escrito, sino que <strong>lo que construyo sigue funcionando años
-            después</strong>. Me gusta el código limpio, resolver problemas (sí, también por
-            gusto en LeetCode) y usar la IA como multiplicador para centrarme en lo que importa:
-            el producto y quien lo usa.
-        </p>
-        <p class="stack">JavaScript · TypeScript · PHP · Go · SQL</p>
-    </section>
+        <!-- Columna 2: Skills -->
+        <section class="skills">
+            <h2>Skills</h2>
+            <p class="lead-note">Por orden de importancia. Spoiler: la primera es la única que de verdad cuenta.</p>
 
-    <section class="block">
-        <h2>Proyectos</h2>
-        <ul class="projects">
-            <li>
-                <a href="https://www.jacksonlive.es" target="_blank" rel="noopener">JacksonLive</a>
-                <span>— Agenda de conciertos y música en directo.</span>
-            </li>
-            <li>
-                <a href="https://www.renovarcarnet.com" target="_blank" rel="noopener">RenovarCarnet</a>
-                <span>— Información y trámites para renovar el carnet.</span>
-            </li>
-        </ul>
-    </section>
+            <div class="skill">
+                <h3>Skill nº 1 <span class="aside">— la importante</span></h3>
+                <p>Capacidad de aprender y adaptarme a cualquier cosa. Aprendo hoy lo que me hará
+                   falta mañana. Las demás de esta lista son, básicamente, esta misma aplicada.</p>
+            </div>
 
-    <section class="block">
-        <h2>Enlaces</h2>
-        <ul class="links">
-            <li><a href="https://github.com/antonrodin" target="_blank" rel="noopener">GitHub</a></li>
-            <li><a href="https://www.youtube.com/c/AZRMedia" target="_blank" rel="noopener">YouTube</a></li>
-            <li><a href="https://www.linkedin.com/in/azrodin/" target="_blank" rel="noopener">LinkedIn</a></li>
-            <li><a href="https://www.azrodin.com/" target="_blank" rel="noopener">Blog</a></li>
-        </ul>
-    </section>
+            <div class="skill">
+                <h3>Backend</h3>
+                <p>Go, TypeScript, JavaScript, PHP… lo que haga falta.</p>
+            </div>
 
-    <footer class="foot">
-        <p><a href="mailto:azr@azr.es">azr@azr.es</a></p>
-        <p class="muted">Música · pesca · y siempre algún proyecto entre manos.</p>
-    </footer>
+            <div class="skill">
+                <h3>DevOps</h3>
+                <p>Kubernetes, Prometheus, Nginx, AWS… he usado un poco de todo
+                   <span class="aside">(lo justo para romper producción con conocimiento de causa)</span>.</p>
+            </div>
 
+            <div class="skill">
+                <h3>Frontend</h3>
+                <p>HTML, CSS, BEM, Tailwind, Vue, React Native… etc.</p>
+            </div>
+
+            <div class="skill">
+                <h3>Otras tonterías</h3>
+                <p>Agile, MySQL, PostgreSQL, MongoDB, Jira, GitHub, Microservicios…
+                   <span class="aside">y los buzzwords que toquen ese trimestre</span>.</p>
+            </div>
+        </section>
+
+    </div>
 </main>
 
 {{ end }}

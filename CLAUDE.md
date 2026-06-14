@@ -2,7 +2,9 @@
 
 Web personal de **azr.es** (sitio de Anton Zekeriev Rodin). Aplicación web en **Go** con renderizado server-side de HTML.
 
-> **Estado actual:** la web es una landing "en construcción" — solo muestra nombre, mensaje, contacto y enlaces (Github/Youtube/LinkedIn/Blog). El handler `Home` renderiza `home.go.tmpl` con `nil`: **no usa la base de datos**. El CRUD de `pages` y los modelos existen en el código pero no están cableados a rutas.
+> **Estado actual:** landing de una sola página (sin BD). Diseño minimalista **negro sobre blanco**, dos columnas: izquierda branding (monograma AZR, foto, nombre, claims, redes), derecha "Skills" con tono **sarcástico**. El handler `Home` renderiza `home.go.tmpl` con `nil`: **no usa la base de datos**. El CRUD de `pages` y los modelos existen en el código pero no están cableados a rutas.
+>
+> **Roadmap (deseado por Anton):** añadir Currículum, Proyectos, Experiencia. **Multi-idioma**: español (principal), ruso e inglés. Mantener el tono sarcástico y el estilo negro sobre blanco, muy legible.
 
 > El `README.md` está copiado de otro proyecto ("Circuitos / Nürburgring") y se usa como plantilla de despliegue; ignora sus textos, no son de este sitio. El stack y los comandos sí aplican.
 
