@@ -1,33 +1,95 @@
 {{ template "app" . }}
 
 {{ define "metadata"}}
-<title>Anton Zekeriev Rodin</title>
-<meta name="description" content="Anton Zekeriev Rodin" />
+<title>Antón Zekeriev Rodin — Desarrollador de software</title>
+<meta name="description" content="Antón Zekeriev Rodin, desarrollador full-stack con ~20 años de experiencia. Creo y mantengo productos que siguen funcionando años después: JacksonLive, RenovarCarnet y más." />
 <meta name="robots" content="all" />
 
-<!-- <meta property="og:url" content="" /> -->
+<meta property="og:url" content="https://azr.es/" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Anton Zekeriev Rodin" />
-<meta property="og:description" content="Anton Zekeriev Rodin" />
+<meta property="og:title" content="Antón Zekeriev Rodin — Desarrollador de software" />
+<meta property="og:description" content="Desarrollador full-stack. Construyo productos que perduran. Go · TypeScript · PHP · SQL." />
 <meta property="og:image" content="/public/img/azr.jpg" />
 {{ end }}
 
 {{ define "content" }}
 
-<div class="px-4 py-5 my-5 text-center">
-    <h1 class="display-5 fw-bold text-body-emphasis">Antón Zekeriev Rodin</h1>
-    <div class="col-lg-6 mx-auto">
-        <p class="lead mb-4">Actualmente la web se encuentra en construcción. Puedes contactar conmigo a traves del
-            correo <a href="mailto:azr@azr.es">azr@azr.es</a> o a través del
-            telefono +34 675 649 322. Tambien me puedes encontrar aquí:</p>
+<div class="container py-5">
 
-        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            <a href="https://github.com/antonrodin" class="btn btn-outline-secondary btn-sm px-4 gap-3">Github</a>
-            <a href="https://www.youtube.com/c/AZRMedia" class="btn btn-outline-secondary btn-sm px-4">Youtube</a>
-            <a href="https://www.linkedin.com/in/azrodin/" class="btn btn-outline-secondary btn-sm px-4">Linkedit</a>
-            <a href="https://www.azrodin.com/" class="btn btn-outline-secondary btn-sm px-4">Blog</a>
+    <!-- Hero -->
+    <section class="text-center py-5">
+        <div class="avatar mx-auto mb-4">AZR</div>
+        <h1 class="display-5 fw-bold mb-2">Antón Zekeriev Rodin</h1>
+        <p class="lead text-secondary mb-4">
+            Desarrollador de software · ~20 años construyendo productos que siguen vivos
+        </p>
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            <span class="badge rounded-pill text-bg-secondary">JavaScript</span>
+            <span class="badge rounded-pill text-bg-secondary">TypeScript</span>
+            <span class="badge rounded-pill text-bg-secondary">PHP</span>
+            <span class="badge rounded-pill text-bg-secondary">Go</span>
+            <span class="badge rounded-pill text-bg-secondary">SQL</span>
         </div>
-    </div>
+    </section>
+
+    <!-- Sobre mí -->
+    <section class="col-lg-7 mx-auto text-center py-4">
+        <p class="fs-5 text-body-secondary">
+            Soy desarrollador full-stack y padre. Lo que más me enorgullece no es la cantidad
+            de código que he escrito, sino que <strong class="text-body">lo que construyo sigue
+            funcionando años después</strong>. Me gusta el código limpio, resolver problemas
+            (sí, también por gusto en LeetCode) y usar la IA como multiplicador para centrarme
+            en lo que importa: el producto y quien lo usa.
+        </p>
+    </section>
+
+    <!-- Proyectos -->
+    <section class="py-4">
+        <h2 class="h5 text-center text-secondary text-uppercase mb-4" style="letter-spacing:.1em">Proyectos</h2>
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-5">
+                <a href="https://www.jacksonlive.es" class="text-decoration-none" target="_blank" rel="noopener">
+                    <div class="card project-card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title mb-1">JacksonLive</h3>
+                            <p class="card-text text-secondary mb-0">Agenda de conciertos y música en directo.</p>
+                            <small class="text-body-secondary">jacksonlive.es</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-5">
+                <a href="https://www.renovarcarnet.com" class="text-decoration-none" target="_blank" rel="noopener">
+                    <div class="card project-card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title mb-1">RenovarCarnet</h3>
+                            <p class="card-text text-secondary mb-0">Información y trámites para renovar el carnet.</p>
+                            <small class="text-body-secondary">renovarcarnet.com</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enlaces -->
+    <section class="text-center py-4">
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            <a href="https://github.com/antonrodin" class="btn btn-outline-light btn-sm px-4" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://www.youtube.com/c/AZRMedia" class="btn btn-outline-light btn-sm px-4" target="_blank" rel="noopener">YouTube</a>
+            <a href="https://www.linkedin.com/in/azrodin/" class="btn btn-outline-light btn-sm px-4" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://www.azrodin.com/" class="btn btn-outline-light btn-sm px-4" target="_blank" rel="noopener">Blog</a>
+        </div>
+    </section>
+
+    <!-- Contacto -->
+    <section class="text-center pt-4">
+        <p class="text-body-secondary mb-1">
+            ¿Hablamos? <a href="mailto:azr@azr.es" class="link-light">azr@azr.es</a>
+        </p>
+        <p class="text-secondary small mb-0">Música · pesca · y siempre algún proyecto entre manos.</p>
+    </section>
+
 </div>
 
 {{ end }}

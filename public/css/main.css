@@ -1,0 +1,35 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* Avatar con iniciales (placeholder hasta tener foto de perfil) */
+.avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.75rem;
+    letter-spacing: .05em;
+    color: #fff;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, .35);
+}
+
+/* Tarjetas de proyecto */
+.project-card {
+    transition: transform .15s ease, border-color .15s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--bs-secondary-color);
+}
