@@ -8,20 +8,15 @@ main {
     flex: 1 0 auto;
 }
 
-/* Avatar con iniciales (placeholder hasta tener foto de perfil) */
-.avatar {
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.75rem;
-    letter-spacing: .05em;
-    color: #fff;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, .35);
+/* Foto destacada */
+.hero-photo {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    border-radius: 1rem;
+    border: 1px solid var(--bs-border-color);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
 }
 
 /* Tarjetas de proyecto */
