@@ -2,9 +2,11 @@
 
 Web personal de **azr.es** (sitio de Anton Zekeriev Rodin). Aplicación web en **Go** con renderizado server-side de HTML.
 
-> **Estado actual:** landing de una sola página (sin BD). Diseño minimalista **negro sobre blanco**, dos columnas: izquierda branding (monograma AZR, foto, nombre, claims, redes), derecha "Skills" con tono **sarcástico**. El handler `Home` renderiza `home.go.tmpl` con `nil`: **no usa la base de datos**. El CRUD de `pages` y los modelos existen en el código pero no están cableados a rutas.
+> **Estado actual:** landing de una sola página (sin BD) en **tres idiomas**: español (por defecto, ruta `/`), inglés (`/en`) y ruso (`/ru`). Diseño minimalista **negro sobre blanco**, dos columnas: izquierda branding (monograma AZR, foto, nombre, claims, redes — GitHub, YouTube, LinkedIn, Credly, blog, email — y selector de idioma), derecha "Skills" con tono **sarcástico**.
 >
-> **Roadmap (deseado por Anton):** añadir Currículum, Proyectos, Experiencia. **Multi-idioma**: español (principal), ruso e inglés. Mantener el tono sarcástico y el estilo negro sobre blanco, muy legible.
+> **i18n:** los textos viven en `internal/i18n/i18n.go` (mapa `Content` por idioma; para tocar copy se edita ahí, no la plantilla). El handler `Home` resuelve `{lang}` del path y renderiza `home.go.tmpl` con el `Content` del idioma; idioma no soportado → 404. La plantilla emite `canonical` + `hreflang` (x-default → español). Los enlaces sociales están hardcodeados en la plantilla, compartidos por los tres idiomas. **No usa la base de datos**: el CRUD de `pages` y los modelos existen en el código pero no están cableados a rutas.
+>
+> **Roadmap (deseado por Anton):** añadir Currículum, Proyectos, Experiencia. Mantener el tono sarcástico y el estilo negro sobre blanco, muy legible. Anton quiere potenciar sus certificaciones (perfil Credly enlazado desde la home).
 
 > El `README.md` está copiado de otro proyecto ("Circuitos / Nürburgring") y se usa como plantilla de despliegue; ignora sus textos, no son de este sitio. El stack y los comandos sí aplican.
 
@@ -23,7 +25,8 @@ Web personal de **azr.es** (sitio de Anton Zekeriev Rodin). Aplicación web en *
   - `main.go` — `run()`: carga `.env`, abre SQLite, configura sesiones, monta `http.Server` en `:PORT`
   - `routes.go` — rutas chi; sirve estáticos en `/public/*` desde `./public/`
   - `middleware.go` — `LoadSession` (siempre activo) y `Auth` (JWT; redirige a `/login` si no hay token)
-- `internal/handlers/` — controladores; `App` es un singleton `*AppRepository` inicializado con `NewRepo()`. Handlers: `Home`, `Contacto`, `Cookies`, `Legal`
+- `internal/handlers/` — controladores; `App` es un singleton `*AppRepository` inicializado con `NewRepo()`. Handlers: `Home` (i18n por `{lang}`), `Contacto`, `Cookies`, `Legal`
+- `internal/i18n/i18n.go` — struct `Content` y traducciones es/en/ru de toda la home (meta/SEO incluidos); `i18n.Get(lang)` y `i18n.Default = "es"`
 - `internal/models/` — `models.go` define `Page`; `mysqlite/` el acceso a datos
   - `mysqlite/pages.go` — `PageModel`: `Insert`, `Update`, `GetBySlug`, `All` sobre tabla `pages` (id, title, slug, published, content, createdAt, updatedAt) → CRUD de páginas
   - `mysqlite/db.go` — conexión
@@ -58,7 +61,8 @@ env GOOS=linux CGO_ENABLED=1 go build -o app ./cmd/web
 env GOOS=darwin CGO_ENABLED=1 go build -o bin/app ./cmd/web
 ```
 
-En el servidor (Ubuntu 22.04, host `gosha` / 31.24.41.84):
+En el servidor (Ubuntu, host `gosha.vservers.es` / 188.164.198.7 — VPS nuevo tras la migración,
+ver `../VPS-MIGRACION-PLAN.md`; el viejo era 31.24.41.84):
 - Código en `/home/anton/www/azr`, binario `app` corre en **localhost:3331**
 - Gestionado por **supervisor** (patrón igual al de `circuitos`: `/etc/supervisor/conf.d/`, `supervisorctl restart`)
 - **nginx** hace proxy con TLS (Let's Encrypt) → `https://azr.es` y `www.azr.es`
