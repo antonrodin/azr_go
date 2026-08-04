@@ -231,6 +231,18 @@ La galería del fotolog ahora usa el MISMO layout de dos columnas que la home
   home. La página de detalle (`show.go.tmpl`) sigue con su cabecera propia (no migrada aún;
   candidata a usar también la barra lateral si se quiere consistencia total).
 
+## Panel de control de la galería (2026-08-04)
+Debajo de la intro y también debajo del feed, un `.controls` con tres cosas en fila
+(envuelve en móvil): paginación, buscador por título y botón "Subir foto" (movido aquí
+desde la barra lateral; el fotolog llama a `makeBrand(..., false)`).
+- Definido como template `fotolog-controls` en `index.go.tmpl`, usado 2 veces.
+- Búsqueda: `?q=` filtra por `title_es/en/ru` con LIKE (insensible a mayúsculas ASCII);
+  `PhotoModel.CountPublic(q)`/`PublicPage(q,limit,offset)` con `publicWhere(q)`.
+- Paginación **20/página** (`perPage`); `galleryPath(lang,page,q)` preserva página y q en
+  paginación, conmutador de idioma, canonical y alternates.
+- Resultados de búsqueda con `noindex,follow`; sin resultados → `T.NoResults`.
+- Textos nuevos en `i18n/fotolog.go`: SearchPlaceholder/SearchButton/NoResults/UploadLabel/ClearSearch.
+
 ## Estado final: fotolog completo (fases 0-4 hechas, 2026-08-04)
 Falta solo que Anton use la zona privada con fotos reales. Requisitos de ejecución vivos:
 `vips`/`exiftool` en el servidor, `.env` con S3 + `OPENAI_API_KEY` (+ modelos opcionales),
