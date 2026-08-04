@@ -345,13 +345,69 @@ func (app *AppRepository) PhotoEditPost(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
+	// Autotraducción (Fase 3): rellena EN/RU a partir del español. Por
+	// defecto solo completa lo que esté vacío; "retraducir" sobrescribe.
+	flash := "Guardado."
+	retranslate := r.PostFormValue("retranslate") == "1"
+	if msg := app.autoTranslate(r, p, retranslate); msg != "" {
+		flash = msg
+	}
+
 	if err := app.Photos.UpdateTexts(p.ID, p); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	app.Session.Put(r.Context(), "flash", "Guardado.")
+	app.Session.Put(r.Context(), "flash", flash)
 	http.Redirect(w, r, fmt.Sprintf("/admin/fotos/%d", p.ID), http.StatusSeeOther)
+}
+
+// autoTranslate rellena las traducciones EN/RU de p a partir del español.
+// Modifica p in situ y devuelve el mensaje de flash a mostrar (o "" para el
+// mensaje por defecto). Nunca falla el guardado: si la API se cae, avisa y
+// deja los textos como estaban.
+func (app *AppRepository) autoTranslate(r *http.Request, p *models.Photo, overwrite bool) string {
+	if !app.Translator.Enabled() {
+		return ""
+	}
+	// Nada que traducir si no hay origen en español.
+	if p.TitleES == "" && p.DescES == "" {
+		return ""
+	}
+
+	// ¿Hace falta? Solo si vamos a sobrescribir o hay algún destino vacío
+	// con su origen presente (así no gastamos una llamada en balde).
+	need := overwrite ||
+		(p.TitleES != "" && (p.TitleEN == "" || p.TitleRU == "")) ||
+		(p.DescES != "" && (p.DescEN == "" || p.DescRU == ""))
+	if !need {
+		return ""
+	}
+
+	tr, err := app.Translator.Translate(r.Context(), p.TitleES, p.DescES)
+	if err != nil {
+		log.Println("autotraducción:", err)
+		return "Guardado, pero la traducción automática falló (revísalo o reintenta)."
+	}
+
+	// Rellena cada campo si toca sobrescribir o si está vacío.
+	fill := func(dst *string, val string) {
+		if val == "" {
+			return
+		}
+		if overwrite || *dst == "" {
+			*dst = strings.TrimSpace(val)
+		}
+	}
+	fill(&p.TitleEN, tr.TitleEN)
+	fill(&p.TitleRU, tr.TitleRU)
+	fill(&p.DescEN, tr.DescEN)
+	fill(&p.DescRU, tr.DescRU)
+
+	if overwrite {
+		return "Guardado y retraducido a inglés y ruso."
+	}
+	return "Guardado y traducido a inglés y ruso."
 }
 
 // --- Publicar / Despublicar / Borrar ---

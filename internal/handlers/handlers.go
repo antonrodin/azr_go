@@ -8,6 +8,7 @@ import (
 	"github.com/antonrodin/azr/internal/authsvc"
 	"github.com/antonrodin/azr/internal/i18n"
 	"github.com/antonrodin/azr/internal/models/mysqlite"
+	"github.com/antonrodin/azr/internal/openai"
 	"github.com/antonrodin/azr/internal/photos"
 	"github.com/antonrodin/azr/internal/tmpl"
 	"github.com/go-chi/chi/v5"
@@ -16,11 +17,12 @@ import (
 var App *AppRepository
 
 type AppRepository struct {
-	Session *scs.SessionManager
-	Pages   *mysqlite.PageModel
-	Photos  *mysqlite.PhotoModel
-	Storage *photos.Storage
-	Auth    *authsvc.Client
+	Session    *scs.SessionManager
+	Pages      *mysqlite.PageModel
+	Photos     *mysqlite.PhotoModel
+	Storage    *photos.Storage
+	Auth       *authsvc.Client
+	Translator *openai.Translator
 }
 
 func NewRepo(a *AppRepository) {

@@ -13,6 +13,7 @@ import (
 	"github.com/antonrodin/azr/internal/authsvc"
 	"github.com/antonrodin/azr/internal/handlers"
 	"github.com/antonrodin/azr/internal/models/mysqlite"
+	"github.com/antonrodin/azr/internal/openai"
 	"github.com/antonrodin/azr/internal/photos"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -87,16 +88,26 @@ func run() error {
 	}
 	log.Println("S3 storage ready.")
 
+	// Traductor OpenAI (Fase 3). Sin OPENAI_API_KEY queda deshabilitado y el
+	// admin simplemente no autotraduce; el resto funciona igual.
+	translator := openai.NewTranslator(os.Getenv("OPENAI_API_KEY"), os.Getenv("OPENAI_MODEL"))
+	if translator.Enabled() {
+		log.Println("OpenAI translator ready.")
+	} else {
+		log.Println("OpenAI translator disabled (no OPENAI_API_KEY).")
+	}
+
 	app := app{
 		Session: session,
 	}
 
 	appRepo := handlers.AppRepository{
-		Session: session,
-		Pages:   &mysqlite.PageModel{DB: db},
-		Photos:  photoModel,
-		Storage: storage,
-		Auth:    authsvc.New(authService, "azr"),
+		Session:    session,
+		Pages:      &mysqlite.PageModel{DB: db},
+		Photos:     photoModel,
+		Storage:    storage,
+		Auth:       authsvc.New(authService, "azr"),
+		Translator: translator,
 	}
 
 	handlers.NewRepo(&appRepo)

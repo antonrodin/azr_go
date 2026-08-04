@@ -80,7 +80,7 @@ página ligera.
 | 0 | Infraestructura (S3, vips/exiftool, .env) | Baja | — | ✅ Hecha |
 | 1 | Núcleo privado: esquema, login, subida+pipeline, admin, galería privada | **Alta** | Fable | ✅ Hecha (2026-08-04) |
 | 2 | Zona pública + SEO completo + descargas + licencia | Media | Opus 4.8 | ✅ Hecha (2026-08-04) |
-| 3 | Traducción automática ES→EN/RU (OpenAI) al guardar | Baja | Opus 4.8 | ⬜ |
+| 3 | Traducción automática ES→EN/RU (OpenAI) al guardar | Baja | Opus 4.8 | ✅ Hecha (2026-08-04) |
 | 4 | Dictado por voz (MediaRecorder → transcripción → redacción SEO → traducción) | Media | Opus 4.8 | ⬜ |
 
 ### Fase 1 — checklist (hecha; testeada e2e en local con foto JPEG+EXIF+GPS y HEIC)
@@ -150,9 +150,23 @@ Notas de implementación (para fases 3-4):
 - **Anton ya subió una foto real en prod** (id 1, privada, sin título en `~/www/azr`).
   Para publicarla necesita título en español desde `/admin/fotos/1`.
 
-### Fase 3 — checklist
-- [ ] `OPENAI_API_KEY` en `.env`; al guardar desc ES con EN/RU vacíos → traducir
-- [ ] Traducciones siempre editables; nunca sobrescribir texto manual sin pedirlo
+### Fase 3 — checklist (hecha; testeada e2e con llamada real a OpenAI)
+- [x] `OPENAI_API_KEY` en `.env` (local y servidor); `OPENAI_MODEL` opcional
+      (por defecto `gpt-4o-mini`, cambiable sin tocar código)
+- [x] Cliente en `internal/openai/translate.go`: una llamada `chat.completions`
+      (JSON mode) devuelve title/desc en EN y RU a partir del ES
+- [x] Enganchado en `PhotoEditPost` → `autoTranslate`: al guardar rellena solo los
+      campos EN/RU vacíos; no gasta llamada si no hace falta; si la API falla, guarda
+      igual y avisa por flash (nunca se pierde lo escrito)
+- [x] Casilla "retraducir" en `admin/foto.go.tmpl` para sobrescribir a propósito
+      (cumple "nunca pisar texto manual sin pedirlo"); verificado ambos caminos
+- [x] Traductor deshabilitado si no hay API key (el resto del admin funciona igual)
+
+Notas para la Fase 4:
+- El traductor vive en `app.Translator` (`*openai.Translator`), con `Enabled()`.
+- La Fase 4 (voz) puede reutilizar el mismo patrón: transcribir audio → texto ES →
+  este mismo `autoTranslate` rellena EN/RU. Falta solo el paso audio→texto
+  (`whisper-1` o `gpt-4o-mini-transcribe`, ambos ya disponibles en la cuenta).
 
 ### Fase 4 — checklist
 - [ ] Botón micro (MediaRecorder) en el form de edición móvil
