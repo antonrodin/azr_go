@@ -25,10 +25,13 @@
 <main class="page">
     <nav class="fotolog-top">
         <a href="{{ .T.BasePath }}">{{ .T.Back }}</a>
-        <span class="langs">
-            <a href="{{ .AltES }}" {{ if eq .Lang "es" }}class="active" aria-current="true"{{ end }}>ES</a>
-            <a href="{{ .AltEN }}" {{ if eq .Lang "en" }}class="active" aria-current="true"{{ end }}>EN</a>
-            <a href="{{ .AltRU }}" {{ if eq .Lang "ru" }}class="active" aria-current="true"{{ end }}>RU</a>
+        <span class="fotolog-actions">
+            <a class="btn btn-upload" href="/admin/fotos/subir">Subir foto</a>
+            <span class="langs">
+                <a href="{{ .AltES }}" {{ if eq .Lang "es" }}class="active" aria-current="true"{{ end }}>ES</a>
+                <a href="{{ .AltEN }}" {{ if eq .Lang "en" }}class="active" aria-current="true"{{ end }}>EN</a>
+                <a href="{{ .AltRU }}" {{ if eq .Lang "ru" }}class="active" aria-current="true"{{ end }}>RU</a>
+            </span>
         </span>
     </nav>
 

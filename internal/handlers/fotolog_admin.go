@@ -73,15 +73,20 @@ func (app *AppRepository) render(w http.ResponseWriter, name string, data interf
 type loginPage struct {
 	adminPage
 	Email string
+	Next  string
 }
 
 func (app *AppRepository) LoginForm(w http.ResponseWriter, r *http.Request) {
-	app.render(w, "admin/login.go.tmpl", loginPage{adminPage: adminPage{Lang: "es"}})
+	app.render(w, "admin/login.go.tmpl", loginPage{
+		adminPage: adminPage{Lang: "es"},
+		Next:      safeNext(r.URL.Query().Get("next")),
+	})
 }
 
 func (app *AppRepository) LoginPost(w http.ResponseWriter, r *http.Request) {
 	email := strings.TrimSpace(r.PostFormValue("email"))
 	password := r.PostFormValue("password")
+	next := safeNext(r.PostFormValue("next"))
 
 	token, err := app.Auth.Login(r.Context(), email, password)
 	if err != nil {
@@ -94,6 +99,7 @@ func (app *AppRepository) LoginPost(w http.ResponseWriter, r *http.Request) {
 		app.render(w, "admin/login.go.tmpl", loginPage{
 			adminPage: adminPage{Lang: "es", Error: msg},
 			Email:     email,
+			Next:      next,
 		})
 		return
 	}
@@ -104,7 +110,17 @@ func (app *AppRepository) LoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 	app.Session.Put(r.Context(), "token", token)
 
-	http.Redirect(w, r, "/admin/fotos", http.StatusSeeOther)
+	http.Redirect(w, r, next, http.StatusSeeOther)
+}
+
+// safeNext valida el destino post-login: solo rutas internas de este sitio.
+// Rechaza URLs absolutas y protocol-relative ("//host") para evitar
+// redirecciones abiertas a sitios externos. Por defecto, el listado de fotos.
+func safeNext(next string) string {
+	if strings.HasPrefix(next, "/") && !strings.HasPrefix(next, "//") {
+		return next
+	}
+	return "/admin/fotos"
 }
 
 func (app *AppRepository) Logout(w http.ResponseWriter, r *http.Request) {

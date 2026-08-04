@@ -5,12 +5,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 func LoadSession(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
+}
+
+// redirectToLogin manda al login recordando a dónde iba el usuario, para
+// devolverlo ahí tras autenticarse (parámetro "next").
+func redirectToLogin(w http.ResponseWriter, r *http.Request) {
+	login := "/login?next=" + url.QueryEscape(r.URL.RequestURI())
+	http.Redirect(w, r, login, http.StatusSeeOther)
 }
 
 func Auth(next http.Handler) http.Handler {
@@ -20,7 +28,7 @@ func Auth(next http.Handler) http.Handler {
 
 		if tokenString == "" {
 			log.Println("Not authenticated")
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			redirectToLogin(w, r)
 			return
 		}
 
@@ -35,7 +43,7 @@ func Auth(next http.Handler) http.Handler {
 		})
 		if err != nil {
 			log.Println("Error parsing token: ", err)
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			redirectToLogin(w, r)
 			return
 		}
 

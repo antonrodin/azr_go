@@ -14,6 +14,7 @@
     {{ if .Error }}<p class="flash flash-error">{{ .Error }}</p>{{ end }}
 
     <form method="POST" action="/login" class="admin-form">
+        <input type="hidden" name="next" value="{{ .Next }}">
         <div class="field">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" value="{{ .Email }}" required autocomplete="username">
