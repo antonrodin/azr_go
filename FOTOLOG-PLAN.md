@@ -205,6 +205,18 @@ Cliente OpenAI unificado en `internal/openai` (renombrado de `Translator` a `Cli
     con `promptOr(key, default)` (cae al default si falta BD o está vacío).
   - Añadir un prompt nuevo = nueva entrada en `PromptRegistry` + usar su clave.
 
+## Rediseño de la galería (2026-08-04)
+La galería usaba una rejilla cuadrada (`aspect-ratio:1/1`+`object-fit:cover`) que
+recortaba las fotos y con pocas fotos se veía rota. Sustituida por un **feed de una
+columna centrado** (`.fotolog` max-width 600px; `.feed`/`.feed-item`): fotos a su
+proporción real, grandes y nítidas (srcset 400/1200/2048, `sizes` 100vw→600px), título
+debajo. Cabecera `.fotolog-bar` con `flex-wrap` para no desbordarse en móvil.
+- Verificación visual con Chrome headless (`/Applications/Google Chrome.app`):
+  `--headless=new --screenshot`. **Aviso**: el headless NO renderiza fiel el ancho móvil
+  en `file://` (una sola foto ya "desborda" a 390px → artefacto, no bug). El escritorio sí
+  es fiel. Para iterar sin desplegar: preview HTML local que apunta a la CSS real y a la
+  URL pública S3 de una foto real. No hay MCP de Chrome/Playwright en el entorno.
+
 ## Estado final: fotolog completo (fases 0-4 hechas, 2026-08-04)
 Falta solo que Anton use la zona privada con fotos reales. Requisitos de ejecución vivos:
 `vips`/`exiftool` en el servidor, `.env` con S3 + `OPENAI_API_KEY` (+ modelos opcionales),
