@@ -1,0 +1,76 @@
+{{ template "app" . }}
+
+{{ define "metadata" }}
+<title>Subir fotos — admin</title>
+<meta name="robots" content="noindex, nofollow" />
+{{ end }}
+
+{{ define "content" }}
+<main class="page admin-narrow">
+    <nav class="admin-bar">
+        <span class="monogram">AZR · FOTOLOG</span>
+        <span><a href="/admin/fotos">← Fotos</a></span>
+    </nav>
+
+    <h1>Subir fotos</h1>
+    <p class="aside">Elige varias si quieres. Se suben de una en una, con calma, como todo lo bueno.</p>
+
+    <form id="upload-form" method="POST" action="/admin/fotos" enctype="multipart/form-data" class="admin-form">
+        <div class="field">
+            <input type="file" id="photos" name="photo" accept="image/*,.heic,.heif" multiple required>
+        </div>
+        <button type="submit" class="btn" id="upload-btn">Subir</button>
+    </form>
+
+    <ul id="upload-status" class="upload-status"></ul>
+
+    <script>
+    (function () {
+        var form = document.getElementById('upload-form');
+        var input = document.getElementById('photos');
+        var btn = document.getElementById('upload-btn');
+        var list = document.getElementById('upload-status');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var files = Array.from(input.files);
+            if (!files.length) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Subiendo…';
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var li = document.createElement('li');
+                li.textContent = file.name + ' — subiendo…';
+                list.appendChild(li);
+
+                try {
+                    var fd = new FormData();
+                    fd.append('photo', file);
+                    var resp = await fetch('/admin/fotos', {
+                        method: 'POST',
+                        body: fd,
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    var data = await resp.json();
+                    if (data.ok) {
+                        li.innerHTML = file.name + ' — ✔ subida. <a href="/admin/fotos/' + data.id + '">Editar</a>';
+                    } else {
+                        li.textContent = file.name + ' — ✘ ' + (data.error || 'error desconocido');
+                    }
+                } catch (err) {
+                    li.textContent = file.name + ' — ✘ error de red: ' + err.message;
+                }
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Subir';
+            input.value = '';
+        });
+    })();
+    </script>
+
+    <noscript><p class="aside">Sin JavaScript solo se sube una foto por viaje. También se puede vivir así.</p></noscript>
+</main>
+{{ end }}

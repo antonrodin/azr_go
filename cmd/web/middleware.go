@@ -30,10 +30,8 @@ func Auth(next http.Handler) http.Handler {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
-			hmacSampleSecret := []byte("holacaracola")
-
-			// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-			return hmacSampleSecret, nil
+			// Secreto compartido con el servicio auth, cargado de .env en run().
+			return jwtSecret, nil
 		})
 		if err != nil {
 			log.Println("Error parsing token: ", err)

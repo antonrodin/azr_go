@@ -13,3 +13,36 @@ type Page struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+// Photo es una foto del fotolog. Los títulos y descripciones van en columnas
+// por idioma (es/en/ru). Status es "private" o "public" y coincide con el
+// prefijo del bucket S3 donde viven sus ficheros.
+type Photo struct {
+	ID         int
+	Slug       string
+	Status     string // "private" | "public"
+	TitleES    string
+	TitleEN    string
+	TitleRU    string
+	DescES     string
+	DescEN     string
+	DescRU     string
+	TakenAt    string // ISO8601 o "" si el EXIF no lo trae
+	UploadedAt string
+	CameraMake string
+	CameraModel string
+	Lens       string
+	Focal      string
+	Aperture   string
+	Shutter    string
+	ISO        string
+	GPSLat     float64 // 0 si no hay GPS (ver HasGPS)
+	GPSLng     float64
+	HasGPS     bool
+	ShowGPS    bool // en fotos públicas el GPS va oculto salvo que se active
+	Width      int
+	Height     int
+	OrigExt    string // extensión del original subido (jpg, heic…)
+	OrigBytes  int64
+	ExifJSON   string // volcado completo de exiftool -json
+}

@@ -1,0 +1,39 @@
+{{ template "app" . }}
+
+{{ define "metadata" }}
+<title>Fotolog — admin</title>
+<meta name="robots" content="noindex, nofollow" />
+{{ end }}
+
+{{ define "content" }}
+<main class="page">
+    <nav class="admin-bar">
+        <span class="monogram">AZR · FOTOLOG</span>
+        <span>
+            <a href="/admin/fotos/subir">Subir fotos</a> ·
+            <a href="/">Ver web</a> ·
+            <a href="/admin/logout">Salir</a>
+        </span>
+    </nav>
+
+    <h1>Fotos</h1>
+
+    {{ if .Flash }}<p class="flash">{{ .Flash }}</p>{{ end }}
+
+    {{ if not .Photos }}
+    <p>Aquí no hay nada. Cero fotos. <a href="/admin/fotos/subir">Sube algo</a>, que para eso montamos todo esto.</p>
+    {{ else }}
+    <div class="photo-grid">
+        {{ range .Photos }}
+        <a class="photo-cell" href="/admin/fotos/{{ .ID }}">
+            <img src="{{ .ThumbURL }}" alt="{{ if .TitleES }}{{ .TitleES }}{{ else }}Sin título{{ end }}" loading="lazy">
+            <span class="photo-cell-meta">
+                <span class="badge {{ if eq .Status "public" }}badge-public{{ end }}">{{ if eq .Status "public" }}pública{{ else }}privada{{ end }}</span>
+                {{ if .TitleES }}{{ .TitleES }}{{ else }}<em>sin título</em>{{ end }}
+            </span>
+        </a>
+        {{ end }}
+    </div>
+    {{ end }}
+</main>
+{{ end }}

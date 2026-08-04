@@ -1,0 +1,105 @@
+{{ template "app" . }}
+
+{{ define "metadata" }}
+<title>Editar foto — admin</title>
+<meta name="robots" content="noindex, nofollow" />
+{{ end }}
+
+{{ define "content" }}
+<main class="page">
+    <nav class="admin-bar">
+        <span class="monogram">AZR · FOTOLOG</span>
+        <span><a href="/admin/fotos">← Fotos</a></span>
+    </nav>
+
+    {{ if .Flash }}<p class="flash">{{ .Flash }}</p>{{ end }}
+
+    {{ with .Photo }}
+    <div class="photo-edit">
+        <div>
+            <img class="photo-preview" src="{{ .ImageURL }}" alt="{{ .TitleES }}">
+
+            <p class="aside">
+                <span class="badge {{ if eq .Status "public" }}badge-public{{ end }}">{{ if eq .Status "public" }}pública — /fotolog/{{ .Slug }}{{ else }}privada{{ end }}</span>
+            </p>
+
+            <table class="exif-table">
+                {{ if .TakenAt }}<tr><th>Fecha</th><td>{{ .TakenAt }}</td></tr>{{ end }}
+                {{ if .CameraMake }}<tr><th>Cámara</th><td>{{ .CameraMake }} {{ .CameraModel }}</td></tr>{{ end }}
+                {{ if .Lens }}<tr><th>Objetivo</th><td>{{ .Lens }}</td></tr>{{ end }}
+                {{ if .Focal }}<tr><th>Focal</th><td>{{ .Focal }}</td></tr>{{ end }}
+                {{ if .Aperture }}<tr><th>Apertura</th><td>{{ .Aperture }}</td></tr>{{ end }}
+                {{ if .Shutter }}<tr><th>Exposición</th><td>{{ .Shutter }}</td></tr>{{ end }}
+                {{ if .ISO }}<tr><th>ISO</th><td>{{ .ISO }}</td></tr>{{ end }}
+                <tr><th>Tamaño</th><td>{{ .Width }}×{{ .Height }} ({{ .OrigExt }}, {{ .OrigBytes }} bytes)</td></tr>
+                {{ if .HasGPS }}<tr><th>GPS</th><td><a href="https://www.openstreetmap.org/?mlat={{ .GPSLat }}&mlon={{ .GPSLng }}#map=16/{{ .GPSLat }}/{{ .GPSLng }}" target="_blank" rel="noopener">{{ printf "%.5f" .GPSLat }}, {{ printf "%.5f" .GPSLng }}</a></td></tr>{{ end }}
+            </table>
+
+            <p><a href="{{ .OrigURL }}">Descargar original</a></p>
+
+            <details>
+                <summary class="aside">EXIF completo (para muy cafeteros)</summary>
+                <pre class="exif-raw">{{ .ExifJSON }}</pre>
+            </details>
+        </div>
+
+        <div>
+            <form method="POST" action="/admin/fotos/{{ .ID }}" class="admin-form">
+                <div class="field">
+                    <label for="title_es">Título (ES)</label>
+                    <input type="text" id="title_es" name="title_es" value="{{ .TitleES }}">
+                </div>
+                <div class="field">
+                    <label for="desc_es">Descripción (ES)</label>
+                    <textarea id="desc_es" name="desc_es" rows="4">{{ .DescES }}</textarea>
+                </div>
+                <div class="field">
+                    <label for="title_en">Título (EN)</label>
+                    <input type="text" id="title_en" name="title_en" value="{{ .TitleEN }}">
+                </div>
+                <div class="field">
+                    <label for="desc_en">Descripción (EN)</label>
+                    <textarea id="desc_en" name="desc_en" rows="4">{{ .DescEN }}</textarea>
+                </div>
+                <div class="field">
+                    <label for="title_ru">Título (RU)</label>
+                    <input type="text" id="title_ru" name="title_ru" value="{{ .TitleRU }}">
+                </div>
+                <div class="field">
+                    <label for="desc_ru">Descripción (RU)</label>
+                    <textarea id="desc_ru" name="desc_ru" rows="4">{{ .DescRU }}</textarea>
+                </div>
+
+                {{ if .HasGPS }}
+                <div class="field field-check">
+                    <label>
+                        <input type="checkbox" name="show_gps" value="1" {{ if .ShowGPS }}checked{{ end }}>
+                        Mostrar ubicación en la foto pública <span class="aside">(piénsalo dos veces si es tu casa)</span>
+                    </label>
+                </div>
+                {{ end }}
+
+                <button type="submit" class="btn">Guardar</button>
+            </form>
+
+            <div class="admin-actions">
+                {{ if eq .Status "public" }}
+                <form method="POST" action="/admin/fotos/{{ .ID }}/despublicar">
+                    <button type="submit" class="btn">Despublicar</button>
+                </form>
+                {{ else }}
+                <form method="POST" action="/admin/fotos/{{ .ID }}/publicar">
+                    <button type="submit" class="btn">Publicar</button>
+                </form>
+                {{ end }}
+
+                <form method="POST" action="/admin/fotos/{{ .ID }}/borrar"
+                      onsubmit="return confirm('¿Borrar la foto y todos sus ficheros? No hay papelera, no hay drama después.');">
+                    <button type="submit" class="btn btn-danger">Borrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+</main>
+{{ end }}

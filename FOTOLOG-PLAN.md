@@ -78,23 +78,38 @@ página ligera.
 | # | Fase | Dificultad | Modelo | Estado |
 |---|------|-----------|--------|--------|
 | 0 | Infraestructura (S3, vips/exiftool, .env) | Baja | — | ✅ Hecha |
-| 1 | Núcleo privado: esquema, login, subida+pipeline, admin, galería privada | **Alta** | Fable | ⬜ |
+| 1 | Núcleo privado: esquema, login, subida+pipeline, admin, galería privada | **Alta** | Fable | ✅ Hecha (2026-08-04) |
 | 2 | Zona pública + SEO completo + descargas + licencia | Media | Opus 4.8 | ⬜ |
 | 3 | Traducción automática ES→EN/RU (OpenAI) al guardar | Baja | Opus 4.8 | ⬜ |
 | 4 | Dictado por voz (MediaRecorder → transcripción → redacción SEO → traducción) | Media | Opus 4.8 | ⬜ |
 
-### Fase 1 — checklist
-- [ ] Migración/creación de tabla `photos` (y arranque que la aplique si no existe)
-- [ ] `JWT_SECRET` desde `.env`; `Cookie.Secure = true`; sesión 30 días
-- [ ] `GET/POST /login` contra `AUTH_SERVICE` (copiar patrón de
-      `certifications/services/web/internal/clients/auth.go`) + `/logout`
-- [ ] Rutas privadas bajo middleware `Auth`: subir, listar (públicas+privadas), editar
-      (títulos/desc/GPS toggle), publicar/despublicar (mueve objetos S3), borrar
-- [ ] Pipeline exiftool→vips→S3 (paquete `internal/photos` o similar; shell-out con
-      `os/exec`, límite de tamaño de subida, limpieza de temporales, HEIC→web ok)
-- [ ] SDK AWS v2 solo S3 (`aws-sdk-go-v2/service/s3` + manager) — presigned GET para privadas
-- [ ] Vista privada de galería/foto para testear desde el móvil
-- [ ] Probar: subir desde iPhone/Android real → ver foto, EXIF y derivados correctos
+### Fase 1 — checklist (hecha; testeada e2e en local con foto JPEG+EXIF+GPS y HEIC)
+- [x] Tabla `photos` creada al arrancar (`PhotoModel.EnsureSchema`, CREATE IF NOT EXISTS)
+- [x] `JWT_SECRET` desde `.env`; `Cookie.Secure` según `ENV=prod`; sesión 30 días;
+      `RenewToken` al hacer login (session fixation)
+- [x] `GET/POST /login` contra `AUTH_SERVICE` (`internal/authsvc`; servicio "azr" —
+      **creado en la BD de auth el 2026-08-04**, usuarios 7 y 10 asignados) + `/admin/logout`
+- [x] Rutas `/admin/*` bajo `Auth`: listar, subir, editar, publicar/despublicar, borrar
+- [x] Pipeline en `internal/photos/`: `exif.go` (2 llamadas exiftool: volcado legible +
+      campos numéricos con -n), `derivatives.go` (vips thumbnail, autorrotate, no
+      amplía, strip), `s3.go` (Storage: upload/presign/move/delete)
+- [x] Derivados: 400/1200/2048.webp + 1200/2048.jpg + orig.{ext};
+      Cache-Control immutable; subida máx. 100 MB
+- [x] Slug del título ES al guardar (único; congelado si la foto es pública);
+      publicar exige título ES
+- [x] Subida móvil: `admin/subir.go.tmpl` con JS vanilla secuencial (Accept: application/json)
+      + fallback form clásico sin JS
+- [ ] Pendiente de Anton: probar subida desde el móvil real en producción
+
+Notas de implementación (para fases 2-4):
+- Vistas admin en `templates/admin/*.go.tmpl`, estilos al final de `public/css/main.css`.
+- `photoView` (handlers) = `*models.Photo` + URLs resueltas (presigned si privada,
+  `Storage.PublicURL` si pública). Presign TTL 15 min.
+- `exif_json` guarda el volcado completo de `exiftool -json -g0` (agrupado, legible) —
+  la fase 2 puede pintar la tabla de metadatos desde las columnas y ofrecer el JSON en
+  un `<details>`.
+- GPS: columnas `gps_lat/gps_lng` NULL si no hay; `show_gps` (0 por defecto) manda en
+  lo público.
 
 ### Fase 2 — checklist
 - [ ] `/fotolog` + `/en/fotolog` + `/ru/fotolog` + detalle `/fotolog/{slug}` (3 idiomas)
