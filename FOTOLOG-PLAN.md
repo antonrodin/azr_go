@@ -139,6 +139,12 @@ Notas de implementación (para fases 3-4):
   `GetPublicBySlug` (esta filtra por `status='public'`, base de la privacidad).
 
 ### ⚠️ Avisos importantes (leer antes de tocar infra)
+- **nginx `client_max_body_size`**: el bloque de `azr.es` DEBE tener
+  `client_max_body_size 100M;` (subidas de fotos de móvil, 2-9 MB). Sin él, nginx usa
+  el default de 1 MB y rechaza la subida con un 413 HTML → el JS del navegador lo intenta
+  leer como JSON y falla con "the string did not match the expected pattern" (típico en
+  Safari). Puesto el 2026-08-04 en `/etc/nginx/sites-available/azr.es`. Si se migra el
+  servidor, replicarlo.
 - **Bucket compartido → separado por entorno.** Producción usa `azr-fotolog`; el `.env`
   **local** apunta a **`azr-fotolog-dev`** (creado 2026-08-04, misma policy public/).
   Motivo: local y prod tienen BDs SQLite independientes, así que los IDs pueden

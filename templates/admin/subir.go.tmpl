@@ -53,6 +53,8 @@
                         body: fd,
                         headers: { 'Accept': 'application/json' }
                     });
+                    if (resp.redirected) throw new Error('sesión caducada, vuelve a entrar');
+                    if (!resp.ok) throw new Error(resp.status === 413 ? 'la foto es demasiado grande' : ('el servidor respondió ' + resp.status));
                     var data = await resp.json();
                     if (data.ok) {
                         li.innerHTML = file.name + ' — ✔ subida. <a href="/admin/fotos/' + data.id + '">Editar</a>';

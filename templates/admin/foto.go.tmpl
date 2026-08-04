@@ -156,6 +156,8 @@
                         var resp = await fetch('/admin/transcribir', {
                             method: 'POST', body: fd, headers: { 'Accept': 'application/json' }
                         });
+                        if (resp.redirected) throw new Error('sesión caducada, vuelve a entrar');
+                        if (!resp.ok) throw new Error(resp.status === 413 ? 'el audio es demasiado grande' : ('el servidor respondió ' + resp.status));
                         var data = await resp.json();
                         if (data.ok) {
                             area.value = area.value.trim() ? (area.value.trim() + '\n\n' + data.text) : data.text;
