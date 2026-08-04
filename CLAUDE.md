@@ -2,9 +2,11 @@
 
 Web personal de **azr.es** (sitio de Anton Zekeriev Rodin). Aplicación web en **Go** con renderizado server-side de HTML.
 
-> **En curso:** se está construyendo un **fotolog** (galería pública CC BY en 3 idiomas +
-> zona privada con subida desde móvil y S3). Plan, decisiones y estado por fases en
-> **`FOTOLOG-PLAN.md`** — léelo antes de trabajar en ello.
+> **Fotolog (en vivo):** galería pública CC BY en 3 idiomas (`/fotolog`, `/{lang}/fotolog`,
+> detalle `/fotolog/{slug}`) + zona privada `/admin` (login contra el servicio auth, subida
+> desde móvil, pipeline exiftool→vips→S3). Fases 1-2 hechas; faltan traducción automática
+> (3) y dictado por voz (4). Plan, decisiones, estado y **avisos de infra** (bucket dev vs
+> prod, sesiones en memoria) en **`FOTOLOG-PLAN.md`** — léelo antes de tocar el fotolog.
 
 > **Estado actual:** landing de una sola página (sin BD) en **tres idiomas**: español (por defecto, ruta `/`), inglés (`/en`) y ruso (`/ru`). Diseño minimalista **negro sobre blanco**, dos columnas: izquierda branding (monograma AZR, foto, nombre, claims, redes — GitHub, YouTube, LinkedIn, Credly, blog, email — y selector de idioma), derecha "Skills" con tono **sarcástico**.
 >
