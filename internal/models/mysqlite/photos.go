@@ -2,6 +2,7 @@ package mysqlite
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/antonrodin/azr/internal/models"
 )
@@ -180,16 +181,32 @@ func (m *PhotoModel) SlugTakenByOther(slug string, id int) (bool, error) {
 // (o de subida si no hay EXIF) descendente.
 const publicOrder = ` ORDER BY CASE WHEN taken_at != '' THEN taken_at ELSE uploaded_at END DESC, id DESC`
 
-// CountPublic cuenta las fotos públicas (para paginar).
-func (m *PhotoModel) CountPublic() (int, error) {
+// publicWhere construye el WHERE de la galería pública, con filtro opcional
+// por título (busca en los tres idiomas). La búsqueda LIKE de SQLite es
+// insensible a mayúsculas para ASCII (suficiente "de momento").
+func publicWhere(q string) (string, []interface{}) {
+	q = strings.TrimSpace(q)
+	if q == "" {
+		return "status = 'public'", nil
+	}
+	like := "%" + q + "%"
+	return "status = 'public' AND (title_es LIKE ? OR title_en LIKE ? OR title_ru LIKE ?)",
+		[]interface{}{like, like, like}
+}
+
+// CountPublic cuenta las fotos públicas (con filtro opcional por título).
+func (m *PhotoModel) CountPublic(q string) (int, error) {
+	where, args := publicWhere(q)
 	var n int
-	err := m.DB.QueryRow(`SELECT COUNT(*) FROM photos WHERE status = 'public'`).Scan(&n)
+	err := m.DB.QueryRow(`SELECT COUNT(*) FROM photos WHERE `+where, args...).Scan(&n)
 	return n, err
 }
 
-// PublicPage devuelve una página de fotos públicas.
-func (m *PhotoModel) PublicPage(limit, offset int) ([]*models.Photo, error) {
-	rows, err := m.DB.Query(`SELECT `+photoColumns+` FROM photos WHERE status = 'public'`+publicOrder+` LIMIT ? OFFSET ?`, limit, offset)
+// PublicPage devuelve una página de fotos públicas (con filtro opcional).
+func (m *PhotoModel) PublicPage(q string, limit, offset int) ([]*models.Photo, error) {
+	where, args := publicWhere(q)
+	args = append(args, limit, offset)
+	rows, err := m.DB.Query(`SELECT `+photoColumns+` FROM photos WHERE `+where+publicOrder+` LIMIT ? OFFSET ?`, args...)
 	if err != nil {
 		return nil, err
 	}

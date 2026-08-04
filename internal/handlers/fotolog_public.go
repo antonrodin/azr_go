@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -15,7 +16,7 @@ import (
 
 const (
 	siteBase     = "https://azr.es"
-	perPage      = 24
+	perPage      = 20
 	fotologImage = "2048.jpg" // imagen de referencia para OG y sitemap
 )
 
@@ -32,12 +33,17 @@ func fotologBase(lang string) string {
 	}
 }
 
-func galleryPath(lang string, page int) string {
+// galleryPath construye la ruta de la galería, preservando la página (>1) y
+// el filtro de búsqueda (q) si los hay.
+func galleryPath(lang string, page int, q string) string {
 	b := fotologBase(lang)
-	if page <= 1 {
-		return b
+	if page > 1 {
+		b = fmt.Sprintf("%s/pagina/%d", b, page)
 	}
-	return fmt.Sprintf("%s/pagina/%d", b, page)
+	if q != "" {
+		b += "?q=" + url.QueryEscape(q)
+	}
+	return b
 }
 
 func photoPath(lang, slug string) string {
@@ -105,10 +111,18 @@ type galleryPage struct {
 	Brand     brandView
 	T         i18n.FotologText
 	Canonical string
+	NoIndex   bool // true en páginas de resultados de búsqueda
 	Photos    []galleryPhoto
-	PrevURL   string
-	NextURL   string
-	// Conmutador de idioma (misma página en cada idioma)
+	// Panel de control
+	Query        string // término de búsqueda actual
+	Searching    bool   // hay filtro activo
+	SearchAction string // action del formulario (base del idioma)
+	UploadURL    string
+	Page         int
+	LastPage     int
+	PrevURL      string
+	NextURL      string
+	// Conmutador de idioma (misma página/búsqueda en cada idioma)
 	LangES string
 	LangEN string
 	LangRU string
@@ -136,7 +150,9 @@ func (app *AppRepository) Fotolog(w http.ResponseWriter, r *http.Request) {
 		page = n
 	}
 
-	total, err := app.Photos.CountPublic()
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+
+	total, err := app.Photos.CountPublic(q)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -150,26 +166,34 @@ func (app *AppRepository) Fotolog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	list, err := app.Photos.PublicPage(perPage, (page-1)*perPage)
+	list, err := app.Photos.PublicPage(q, perPage, (page-1)*perPage)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	// Barra lateral compartida con la portada, con los datos del idioma actual.
+	// Barra lateral compartida con la portada (sin botón de subir: ese vive
+	// ahora en el panel de control).
 	c, _ := i18n.Get(lang)
 
 	data := galleryPage{
-		Lang:      lang,
-		Brand:     makeBrand(c, galleryPath("es", page), galleryPath("en", page), galleryPath("ru", page), true),
-		T:         t,
-		Canonical: siteBase + galleryPath(lang, page),
-		LangES:    galleryPath("es", page),
-		LangEN:    galleryPath("en", page),
-		LangRU:    galleryPath("ru", page),
-		AltES:     siteBase + galleryPath("es", page),
-		AltEN:     siteBase + galleryPath("en", page),
-		AltRU:     siteBase + galleryPath("ru", page),
+		Lang:         lang,
+		Brand:        makeBrand(c, galleryPath("es", page, q), galleryPath("en", page, q), galleryPath("ru", page, q), false),
+		T:            t,
+		Canonical:    siteBase + galleryPath(lang, page, q),
+		NoIndex:      q != "",
+		Query:        q,
+		Searching:    q != "",
+		SearchAction: fotologBase(lang),
+		UploadURL:    "/admin/fotos/subir",
+		Page:         page,
+		LastPage:     lastPage,
+		LangES:       galleryPath("es", page, q),
+		LangEN:       galleryPath("en", page, q),
+		LangRU:       galleryPath("ru", page, q),
+		AltES:        siteBase + galleryPath("es", page, q),
+		AltEN:        siteBase + galleryPath("en", page, q),
+		AltRU:        siteBase + galleryPath("ru", page, q),
 	}
 	for _, p := range list {
 		data.Photos = append(data.Photos, galleryPhoto{
@@ -182,10 +206,10 @@ func (app *AppRepository) Fotolog(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	if page > 1 {
-		data.PrevURL = galleryPath(lang, page-1)
+		data.PrevURL = galleryPath(lang, page-1, q)
 	}
 	if page < lastPage {
-		data.NextURL = galleryPath(lang, page+1)
+		data.NextURL = galleryPath(lang, page+1, q)
 	}
 
 	app.render(w, "fotolog/index.go.tmpl", data)

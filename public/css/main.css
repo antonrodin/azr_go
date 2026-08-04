@@ -385,9 +385,75 @@ a:hover {
     padding: 2rem 0;
 }
 
+/* Panel de control: paginación + buscador + subir foto, en una fila. */
+.controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .6rem 1rem;
+    margin: 1.25rem 0;
+    padding: .8rem 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font-size: .85rem;
+}
+
+.controls-pager {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    white-space: nowrap;
+}
+
+.controls-pager .disabled { color: #cbcbcb; }
+.controls-pageinfo { color: var(--muted); }
+
+.controls-search {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex: 1 1 180px;
+}
+
+.controls-search input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: .4rem .6rem;
+    font: inherit;
+    font-size: .85rem;
+    color: var(--ink);
+    background: #fff;
+}
+
+.controls-search input:focus { outline: none; border-color: var(--ink); }
+
+.controls-search button {
+    border: 1px solid var(--ink);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 4px;
+    padding: .4rem .8rem;
+    font: inherit;
+    font-size: .85rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.controls-search button:hover { background: #f3f3f3; }
+
+.controls-clear {
+    white-space: nowrap;
+    color: var(--muted);
+    font-size: .8rem;
+}
+
+.controls .btn-upload { font-size: .85rem; white-space: nowrap; }
+
 /* Feed: fotos a su proporción real, grandes y nítidas, dentro de la columna. */
 .feed {
-    margin-top: 0;
+    margin-top: 1.5rem;
 }
 
 .feed-item {

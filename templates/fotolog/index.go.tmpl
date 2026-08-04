@@ -4,6 +4,10 @@
 {{ with .T }}
 <title>{{ .GalleryTitle }}</title>
 <meta name="description" content="{{ .GalleryDesc }}" />
+{{ end }}
+{{ if .NoIndex }}
+<meta name="robots" content="noindex, follow" />
+{{ else }}
 <meta name="robots" content="all" />
 {{ end }}
 
@@ -19,6 +23,22 @@
 <meta property="og:description" content="{{ .T.GalleryDesc }}" />
 {{ end }}
 
+{{ define "fotolog-controls" }}
+<div class="controls">
+    <nav class="controls-pager" aria-label="Paginación">
+        {{ if .PrevURL }}<a href="{{ .PrevURL }}">{{ .T.Prev }}</a>{{ else }}<span class="disabled">{{ .T.Prev }}</span>{{ end }}
+        <span class="controls-pageinfo">{{ .Page }} / {{ .LastPage }}</span>
+        {{ if .NextURL }}<a href="{{ .NextURL }}">{{ .T.Next }}</a>{{ else }}<span class="disabled">{{ .T.Next }}</span>{{ end }}
+    </nav>
+    <form class="controls-search" method="get" action="{{ .SearchAction }}" role="search">
+        <input type="search" name="q" value="{{ .Query }}" placeholder="{{ .T.SearchPlaceholder }}" aria-label="{{ .T.SearchPlaceholder }}">
+        <button type="submit">{{ .T.SearchButton }}</button>
+        {{ if .Searching }}<a class="controls-clear" href="{{ .SearchAction }}">{{ .T.ClearSearch }}</a>{{ end }}
+    </form>
+    <a class="btn-upload" href="{{ .UploadURL }}">{{ .T.UploadLabel }}</a>
+</div>
+{{ end }}
+
 {{ define "content" }}
 <main class="page">
     <div class="grid">
@@ -31,8 +51,10 @@
             <h2>{{ .T.GalleryH1 }}</h2>
             <p class="lead-note">{{ .T.GalleryIntro }}</p>
 
+            {{ template "fotolog-controls" . }}
+
             {{ if not .Photos }}
-            <p class="fotolog-empty">{{ .T.Empty }}</p>
+            <p class="fotolog-empty">{{ if .Searching }}{{ .T.NoResults }}{{ else }}{{ .T.Empty }}{{ end }}</p>
             {{ else }}
             <div class="feed">
                 {{ range .Photos }}
@@ -47,12 +69,7 @@
                 {{ end }}
             </div>
 
-            {{ if or .PrevURL .NextURL }}
-            <nav class="fotolog-pager">
-                {{ if .PrevURL }}<a href="{{ .PrevURL }}">{{ .T.Prev }}</a>{{ else }}<span></span>{{ end }}
-                {{ if .NextURL }}<a href="{{ .NextURL }}">{{ .T.Next }}</a>{{ else }}<span></span>{{ end }}
-            </nav>
-            {{ end }}
+            {{ template "fotolog-controls" . }}
             {{ end }}
         </section>
 

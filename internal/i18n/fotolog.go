@@ -23,6 +23,13 @@ type FotologText struct {
 	Next string
 	Back string // volver a la galería
 
+	// Panel de control (paginación + buscador + subir)
+	SearchPlaceholder string
+	SearchButton      string
+	NoResults         string
+	UploadLabel       string
+	ClearSearch       string
+
 	// Metadatos (etiquetas de la tabla EXIF)
 	MetaHeading  string
 	LabelDate    string
@@ -76,6 +83,12 @@ var fotolog = map[string]FotologText{
 		Next: "Siguientes →",
 		Back: "← Volver al fotolog",
 
+		SearchPlaceholder: "Buscar por título…",
+		SearchButton:      "Buscar",
+		NoResults:         "No hay fotos con ese título.",
+		UploadLabel:       "Subir foto",
+		ClearSearch:       "Quitar filtro",
+
 		MetaHeading:  "Datos de la foto",
 		LabelDate:    "Fecha",
 		LabelCamera:  "Cámara",
@@ -112,6 +125,12 @@ var fotolog = map[string]FotologText{
 		Next: "Older →",
 		Back: "← Back to the photolog",
 
+		SearchPlaceholder: "Search by title…",
+		SearchButton:      "Search",
+		NoResults:         "No photos match that title.",
+		UploadLabel:       "Upload photo",
+		ClearSearch:       "Clear filter",
+
 		MetaHeading:  "Photo data",
 		LabelDate:    "Date",
 		LabelCamera:  "Camera",
@@ -147,6 +166,12 @@ var fotolog = map[string]FotologText{
 		Prev: "← Новее",
 		Next: "Старее →",
 		Back: "← Назад в фотолог",
+
+		SearchPlaceholder: "Поиск по названию…",
+		SearchButton:      "Искать",
+		NoResults:         "Нет фотографий с таким названием.",
+		UploadLabel:       "Загрузить фото",
+		ClearSearch:       "Сбросить фильтр",
 
 		MetaHeading:  "Данные снимка",
 		LabelDate:    "Дата",
