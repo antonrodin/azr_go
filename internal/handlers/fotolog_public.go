@@ -170,8 +170,8 @@ func (app *AppRepository) Fotolog(w http.ResponseWriter, r *http.Request) {
 		data.Photos = append(data.Photos, galleryPhoto{
 			Href:   photoPath(lang, p.Slug),
 			Title:  localTitle(p, lang),
-			Src:    app.pubURL(p.ID, "400.webp"),
-			SrcSet: app.pubURL(p.ID, "400.webp") + " 400w, " + app.pubURL(p.ID, "1200.webp") + " 1200w",
+			Src:    app.pubURL(p.ID, "1200.webp"),
+			SrcSet: app.pubURL(p.ID, "400.webp") + " 400w, " + app.pubURL(p.ID, "1200.webp") + " 1200w, " + app.pubURL(p.ID, "2048.webp") + " 2048w",
 			Width:  p.Width,
 			Height: p.Height,
 		})

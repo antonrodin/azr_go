@@ -359,43 +359,98 @@ a:hover {
 
 /* ===== Fotolog público ===== */
 
-.fotolog-top {
+/* Contenedor centrado y estrecho: las fotos mandan, todo lo demás se aparta. */
+.fotolog {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 4rem;
+}
+
+/* Cabecera: barra superior + título + intro. La barra envuelve en móvil
+   para no desbordarse nunca. */
+.fotolog-bar {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
+    gap: .75rem 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.fotolog-actions {
+    display: flex;
+    align-items: center;
     gap: 1rem;
-    margin-bottom: 2.5rem;
 }
 
-.fotolog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: .75rem;
-    margin: 2rem 0;
+.fotolog-head h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 .4rem;
 }
 
-.fotolog-cell {
-    display: block;
-    line-height: 0;
+.fotolog-intro {
+    color: var(--muted);
+    margin: 0 0 1rem;
 }
 
-.fotolog-cell img {
+.fotolog-empty {
+    color: var(--muted);
+    padding: 2rem 0;
+}
+
+/* Feed: una columna, fotos a su proporción real, grandes y nítidas. */
+.feed {
+    margin-top: 2.5rem;
+}
+
+.feed-item {
+    margin: 0 0 3.5rem;
+}
+
+.feed-item a { display: block; line-height: 0; }
+
+.feed-item img {
     width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 4px;
-    background: #f3f3f3;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    background: #f2f2f2;
     transition: opacity .2s;
 }
 
-.fotolog-cell:hover img { opacity: .82; }
+.feed-item a:hover img { opacity: .9; }
+
+.feed-item figcaption {
+    line-height: 1.5;
+    margin-top: .7rem;
+}
+
+.feed-item figcaption a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.feed-item figcaption a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .fotolog-pager {
     display: flex;
     justify-content: space-between;
-    margin-top: 2.5rem;
+    margin-top: 1rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--rule);
+}
+
+/* Cabecera del detalle: misma barra que la galería (no se desborda). */
+.fotolog-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .75rem 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
 }
 
 /* Detalle */
