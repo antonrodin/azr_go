@@ -79,7 +79,7 @@ página ligera.
 |---|------|-----------|--------|--------|
 | 0 | Infraestructura (S3, vips/exiftool, .env) | Baja | — | ✅ Hecha |
 | 1 | Núcleo privado: esquema, login, subida+pipeline, admin, galería privada | **Alta** | Fable | ✅ Hecha (2026-08-04) |
-| 2 | Zona pública + SEO completo + descargas + licencia | Media | Opus 4.8 | ⬜ |
+| 2 | Zona pública + SEO completo + descargas + licencia | Media | Opus 4.8 | ✅ Hecha (2026-08-04) |
 | 3 | Traducción automática ES→EN/RU (OpenAI) al guardar | Baja | Opus 4.8 | ⬜ |
 | 4 | Dictado por voz (MediaRecorder → transcripción → redacción SEO → traducción) | Media | Opus 4.8 | ⬜ |
 
@@ -111,13 +111,44 @@ Notas de implementación (para fases 2-4):
 - GPS: columnas `gps_lat/gps_lng` NULL si no hay; `show_gps` (0 por defecto) manda en
   lo público.
 
-### Fase 2 — checklist
-- [ ] `/fotolog` + `/en/fotolog` + `/ru/fotolog` + detalle `/fotolog/{slug}` (3 idiomas)
-- [ ] Textos de interfaz en `internal/i18n/i18n.go` (mantener tono guasón)
-- [ ] `<picture>` WebP+JPEG, srcset, lazy loading, paginación
-- [ ] Descargas por tamaño + original; bloque de licencia CC BY 4.0 con atribución
-- [ ] hreflang/canonical/OG, schema.org ImageObject con license, sitemap de imágenes
-- [ ] GPS visible solo si `show_gps=1`
+### Fase 2 — checklist (hecha; testeada e2e en local, incl. privacidad)
+- [x] Galería `/fotolog` + `/{lang}/fotolog` + paginación `/fotolog/pagina/{n}` (24/pág)
+      y detalle `/fotolog/{slug}` + `/{lang}/fotolog/{slug}`, en es/en/ru
+- [x] Textos de interfaz del fotolog en `internal/i18n/fotolog.go` (aparte del home,
+      tono guasón); títulos/desc por foto salen de la BD con respaldo a ES
+- [x] `<picture>` WebP+JPEG con srcset+sizes, `loading`/`fetchpriority`, lazy en grid
+- [x] Descargas mediana/grande/original (con tamaño del original); licencia CC BY 4.0
+      con texto humano + atribución copiable + enlace a la licencia
+- [x] hreflang triple + x-default + canonical, OpenGraph + Twitter card,
+      JSON-LD `ImageObject` con `license` + `acquireLicensePage` (badge Licenciable),
+      sitemap de imágenes en `/sitemap.xml` + `/robots.txt`
+- [x] GPS solo si `HasGPS && show_gps`; verificado que con `show_gps=0` no se filtra;
+      foto privada da 404 en público y no sale en galería
+- [x] Enlace al fotolog desde la home (nav, en los 3 idiomas) — enlace interno SEO
+
+Notas de implementación (para fases 3-4):
+- **Bootstrap eliminado** del layout (`templates/layouts/app.go.tmpl`): era un CDN de
+  ~230 KB que no se usaba y contradecía el objetivo de página rápida. La home y el
+  fotolog usan solo `public/css/main.css`. Verificado que la home sigue bien.
+- JSON-LD se inyecta con la func de plantilla **`safeJS`** (`internal/tmpl/tmpl.go`),
+  que devuelve `template.JS`; con `unescaped`/`template.HTML` html/template lo
+  reescapaba dentro de `<script>`. `json.Marshal` ya escapa `< > &`, así que es seguro.
+- Rutas: las estáticas (`/fotolog`, `/sitemap.xml`…) van **antes** del comodín
+  `/{lang}` en `routes.go`; chi prioriza estáticas, no chocan.
+- Consultas públicas en `photos.go`: `CountPublic`, `PublicPage`, `AllPublic`,
+  `GetPublicBySlug` (esta filtra por `status='public'`, base de la privacidad).
+
+### ⚠️ Avisos importantes (leer antes de tocar infra)
+- **Bucket compartido → separado por entorno.** Producción usa `azr-fotolog`; el `.env`
+  **local** apunta a **`azr-fotolog-dev`** (creado 2026-08-04, misma policy public/).
+  Motivo: local y prod tienen BDs SQLite independientes, así que los IDs pueden
+  colisionar y un test local sobrescribiría ficheros de producción. NO apuntes el .env
+  local a `azr-fotolog`.
+- **Sesiones en memoria**: `scs` sin store persistente → cada `supervisorctl restart`
+  cierra la sesión y hay que volver a hacer login (aunque el Lifetime sea 30 días).
+  Mejora opcional futura: `scs/sqlite3store` sobre la misma BD.
+- **Anton ya subió una foto real en prod** (id 1, privada, sin título en `~/www/azr`).
+  Para publicarla necesita título en español desde `/admin/fotos/1`.
 
 ### Fase 3 — checklist
 - [ ] `OPENAI_API_KEY` en `.env`; al guardar desc ES con EN/RU vacíos → traducir

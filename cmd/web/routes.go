@@ -14,12 +14,26 @@ func (app *app) routes() http.Handler {
 	router.Use(LoadSession)
 
 	// Rutes
-	router.Get("/", handlers.App.Home)       // español por defecto
-	router.Get("/{lang}", handlers.App.Home) // /es, /en, /ru
+	router.Get("/", handlers.App.Home) // español por defecto
+
+	// SEO
+	router.Get("/robots.txt", handlers.App.Robots)
+	router.Get("/sitemap.xml", handlers.App.Sitemap)
+
+	// Fotolog público. Las rutas estáticas ("/fotolog") tienen prioridad
+	// sobre el comodín "/{lang}" en chi, así que no chocan con la home.
+	router.Get("/fotolog", handlers.App.Fotolog)
+	router.Get("/fotolog/pagina/{n}", handlers.App.Fotolog)
+	router.Get("/fotolog/{slug}", handlers.App.FotologPhoto)
+	router.Get("/{lang}/fotolog", handlers.App.Fotolog)
+	router.Get("/{lang}/fotolog/pagina/{n}", handlers.App.Fotolog)
+	router.Get("/{lang}/fotolog/{slug}", handlers.App.FotologPhoto)
 
 	// Login contra el servicio auth
 	router.Get("/login", handlers.App.LoginForm)
 	router.Post("/login", handlers.App.LoginPost)
+
+	router.Get("/{lang}", handlers.App.Home) // /es, /en, /ru
 
 	// Zona privada del fotolog
 	router.Route("/admin", func(r chi.Router) {

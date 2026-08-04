@@ -54,6 +54,10 @@ type Content struct {
 	// Colofón
 	ColophonPre  string
 	ColophonPost string
+
+	// Enlace al fotolog (nav de la home)
+	FotologNav string
+	FotologURL string
 }
 
 var content = map[string]Content{
@@ -89,6 +93,8 @@ var content = map[string]Content{
 		OtherAside:      "y los buzzwords que toquen ese trimestre",
 		ColophonPre:     "Esta página está vibecodeada con",
 		ColophonPost:    ". Ni una línea escrita a mano, y mira qué legible ha quedado.",
+		FotologNav:      "Fotolog",
+		FotologURL:      "/fotolog",
 	},
 	"en": {
 		Lang: "en", Path: "/en",
@@ -122,6 +128,8 @@ var content = map[string]Content{
 		OtherAside:      "and whatever buzzwords are trending this quarter",
 		ColophonPre:     "This page is vibecoded with",
 		ColophonPost:    ". Not a single line written by hand, and look how readable it turned out.",
+		FotologNav:      "Photolog",
+		FotologURL:      "/en/fotolog",
 	},
 	"ru": {
 		Lang: "ru", Path: "/ru",
@@ -155,6 +163,8 @@ var content = map[string]Content{
 		OtherAside:      "и любые баззворды этого квартала",
 		ColophonPre:     "Эта страница сделана вайбкодингом с помощью",
 		ColophonPost:    ". Ни строчки вручную — и посмотрите, как читабельно получилось.",
+		FotologNav:      "Фотолог",
+		FotologURL:      "/ru/fotolog",
 	},
 }
 

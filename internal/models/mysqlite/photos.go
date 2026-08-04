@@ -175,3 +175,58 @@ func (m *PhotoModel) SlugTakenByOther(slug string, id int) (bool, error) {
 	err := m.DB.QueryRow(`SELECT COUNT(*) FROM photos WHERE slug = ? AND id != ?`, slug, id).Scan(&n)
 	return n > 0, err
 }
+
+// publicOrder es el criterio de la galería pública: por fecha de captura
+// (o de subida si no hay EXIF) descendente.
+const publicOrder = ` ORDER BY CASE WHEN taken_at != '' THEN taken_at ELSE uploaded_at END DESC, id DESC`
+
+// CountPublic cuenta las fotos públicas (para paginar).
+func (m *PhotoModel) CountPublic() (int, error) {
+	var n int
+	err := m.DB.QueryRow(`SELECT COUNT(*) FROM photos WHERE status = 'public'`).Scan(&n)
+	return n, err
+}
+
+// PublicPage devuelve una página de fotos públicas.
+func (m *PhotoModel) PublicPage(limit, offset int) ([]*models.Photo, error) {
+	rows, err := m.DB.Query(`SELECT `+photoColumns+` FROM photos WHERE status = 'public'`+publicOrder+` LIMIT ? OFFSET ?`, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var out []*models.Photo
+	for rows.Next() {
+		p, err := m.scan(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, p)
+	}
+	return out, rows.Err()
+}
+
+// AllPublic devuelve todas las fotos públicas (para el sitemap).
+func (m *PhotoModel) AllPublic() ([]*models.Photo, error) {
+	rows, err := m.DB.Query(`SELECT ` + photoColumns + ` FROM photos WHERE status = 'public'` + publicOrder)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var out []*models.Photo
+	for rows.Next() {
+		p, err := m.scan(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, p)
+	}
+	return out, rows.Err()
+}
+
+// GetPublicBySlug devuelve una foto pública por slug (nil si no existe o es privada).
+func (m *PhotoModel) GetPublicBySlug(slug string) (*models.Photo, error) {
+	row := m.DB.QueryRow(`SELECT `+photoColumns+` FROM photos WHERE slug = ? AND status = 'public'`, slug)
+	return m.scan(row)
+}

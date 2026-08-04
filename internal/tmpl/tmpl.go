@@ -9,6 +9,7 @@ import (
 var funcMap = template.FuncMap{
 	"toUpper":   toUpper,
 	"unescaped": unescaped,
+	"safeJS":    safeJS,
 }
 
 func toUpper(str string) string {
@@ -17,6 +18,13 @@ func toUpper(str string) string {
 
 func unescaped(str string) template.HTML {
 	return template.HTML(str)
+}
+
+// safeJS marca una cadena como JS ya seguro (p.ej. JSON-LD generado con
+// json.Marshal, que escapa < > &). Sin esto, html/template la reescaparía
+// como literal de cadena dentro de <script>.
+func safeJS(str string) template.JS {
+	return template.JS(str)
 }
 
 func Get(path string) *template.Template {

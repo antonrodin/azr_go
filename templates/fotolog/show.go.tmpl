@@ -1,0 +1,82 @@
+{{ template "app" . }}
+
+{{ define "metadata" }}
+<title>{{ .Title }} — {{ .T.GalleryH1 }} · azr.es</title>
+<meta name="description" content="{{ if .Desc }}{{ .Desc }}{{ else }}{{ .Title }} — {{ .T.GalleryDesc }}{{ end }}" />
+<meta name="robots" content="all" />
+
+<link rel="canonical" href="{{ .Canonical }}" />
+<link rel="alternate" hreflang="es" href="{{ .AltES }}" />
+<link rel="alternate" hreflang="en" href="{{ .AltEN }}" />
+<link rel="alternate" hreflang="ru" href="{{ .AltRU }}" />
+<link rel="alternate" hreflang="x-default" href="{{ .AltES }}" />
+
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ .Canonical }}" />
+<meta property="og:title" content="{{ .Title }}" />
+{{ if .Desc }}<meta property="og:description" content="{{ .Desc }}" />{{ end }}
+<meta property="og:image" content="{{ .OgImage }}" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<script type="application/ld+json">{{ .JSONLD | safeJS }}</script>
+{{ end }}
+
+{{ define "content" }}
+<main class="page">
+    <nav class="fotolog-top">
+        <a href="{{ .T.BasePath }}">{{ .T.Back }}</a>
+        <span class="langs">
+            <a href="{{ .AltES }}" {{ if eq .Lang "es" }}class="active" aria-current="true"{{ end }}>ES</a>
+            <a href="{{ .AltEN }}" {{ if eq .Lang "en" }}class="active" aria-current="true"{{ end }}>EN</a>
+            <a href="{{ .AltRU }}" {{ if eq .Lang "ru" }}class="active" aria-current="true"{{ end }}>RU</a>
+        </span>
+    </nav>
+
+    <article class="photo-detail">
+        <figure class="photo-figure">
+            <picture>
+                <source type="image/webp" srcset="{{ .SrcSetWebP }}" sizes="(max-width: 1000px) 100vw, 960px">
+                <img src="{{ .SrcJPG }}" srcset="{{ .SrcSetJPG }}" sizes="(max-width: 1000px) 100vw, 960px"
+                     {{ with .Photo }}width="{{ .Width }}" height="{{ .Height }}"{{ end }}
+                     alt="{{ .Title }}" loading="eager" fetchpriority="high">
+            </picture>
+            <figcaption>
+                <h1>{{ .Title }}</h1>
+                {{ if .Desc }}<p class="photo-desc">{{ .Desc }}</p>{{ end }}
+            </figcaption>
+        </figure>
+
+        <div class="photo-side">
+            {{ with .Photo }}
+            <h2>{{ $.T.MetaHeading }}</h2>
+            <table class="exif-table">
+                {{ if .TakenAt }}<tr><th>{{ $.T.LabelDate }}</th><td>{{ .TakenAt }}</td></tr>{{ end }}
+                {{ if .CameraMake }}<tr><th>{{ $.T.LabelCamera }}</th><td>{{ .CameraMake }} {{ .CameraModel }}</td></tr>{{ end }}
+                {{ if .Lens }}<tr><th>{{ $.T.LabelLens }}</th><td>{{ .Lens }}</td></tr>{{ end }}
+                {{ if .Focal }}<tr><th>{{ $.T.LabelFocal }}</th><td>{{ .Focal }}</td></tr>{{ end }}
+                {{ if .Aperture }}<tr><th>{{ $.T.LabelApert }}</th><td>{{ .Aperture }}</td></tr>{{ end }}
+                {{ if .Shutter }}<tr><th>{{ $.T.LabelShutter }}</th><td>{{ .Shutter }}</td></tr>{{ end }}
+                {{ if .ISO }}<tr><th>{{ $.T.LabelISO }}</th><td>{{ .ISO }}</td></tr>{{ end }}
+                <tr><th>{{ $.T.LabelDims }}</th><td>{{ .Width }}×{{ .Height }}</td></tr>
+                {{ if $.ShowGPS }}<tr><th>{{ $.T.LabelGPS }}</th><td><a href="https://www.openstreetmap.org/?mlat={{ $.GPSLat }}&amp;mlon={{ $.GPSLng }}#map=15/{{ $.GPSLat }}/{{ $.GPSLng }}" target="_blank" rel="noopener">{{ printf "%.4f" $.GPSLat }}, {{ printf "%.4f" $.GPSLng }}</a></td></tr>{{ end }}
+            </table>
+            {{ end }}
+
+            <h2>{{ .T.DownloadsHeading }}</h2>
+            <ul class="downloads">
+                {{ range .Downloads }}
+                <li><a href="{{ .URL }}" download>{{ .Label }}</a> <span class="aside">{{ .Note }}</span></li>
+                {{ end }}
+            </ul>
+
+            <div class="license">
+                <h2>{{ .T.LicenseHeading }}</h2>
+                <p>{{ .T.LicenseBody }}</p>
+                <p>{{ .T.LicenseHowto }}</p>
+                <p class="attribution"><code>{{ .T.Attribution }}</code></p>
+                <p><a href="{{ .LicenseURL }}" target="_blank" rel="license noopener">{{ .LicenseName }}</a></p>
+            </div>
+        </div>
+    </article>
+</main>
+{{ end }}
