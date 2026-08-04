@@ -1,6 +1,5 @@
-// Package openai traduce los textos del fotolog (título y descripción) del
-// español a inglés y ruso con un modelo barato de OpenAI. Es la Fase 3 del
-// fotolog: al guardar una foto, rellena las traducciones que falten.
+// Package openai integra los servicios de OpenAI que usa el fotolog:
+// traducción de textos (Fase 3) y transcripción de voz + pulido (Fase 4).
 package openai
 
 import (
@@ -12,34 +11,43 @@ import (
 	"time"
 )
 
-const endpoint = "https://api.openai.com/v1/chat/completions"
+const chatEndpoint = "https://api.openai.com/v1/chat/completions"
 
-// DefaultModel es el modelo por defecto si no se define OPENAI_MODEL.
+// DefaultModel es el modelo de chat por defecto (OPENAI_MODEL).
 const DefaultModel = "gpt-4o-mini"
 
-// Translator llama a la API de OpenAI. Si apiKey está vacío, el traductor
-// se considera deshabilitado (el llamante debe comprobar Enabled()).
-type Translator struct {
-	apiKey string
-	model  string
-	http   *http.Client
+// DefaultTranscribeModel es el modelo de transcripción por defecto
+// (OPENAI_TRANSCRIBE_MODEL).
+const DefaultTranscribeModel = "gpt-4o-mini-transcribe"
+
+// Client llama a la API de OpenAI. Si apiKey está vacío, se considera
+// deshabilitado (el llamante debe comprobar Enabled()).
+type Client struct {
+	apiKey          string
+	model           string
+	transcribeModel string
+	http            *http.Client
 }
 
-func NewTranslator(apiKey, model string) *Translator {
+func NewClient(apiKey, model, transcribeModel string) *Client {
 	if model == "" {
 		model = DefaultModel
 	}
-	return &Translator{
-		apiKey: apiKey,
-		model:  model,
-		// La traducción es corta pero la latencia de la API varía; 30s de
+	if transcribeModel == "" {
+		transcribeModel = DefaultTranscribeModel
+	}
+	return &Client{
+		apiKey:          apiKey,
+		model:           model,
+		transcribeModel: transcribeModel,
+		// Traducir es rápido; transcribir un audio puede tardar más. 60s de
 		// margen para no cortar una respuesta legítima.
-		http: &http.Client{Timeout: 30 * time.Second},
+		http: &http.Client{Timeout: 60 * time.Second},
 	}
 }
 
 // Enabled indica si hay API key configurada.
-func (t *Translator) Enabled() bool { return t != nil && t.apiKey != "" }
+func (t *Client) Enabled() bool { return t != nil && t.apiKey != "" }
 
 // Translation son los textos traducidos. Un campo vacío en el original
 // produce vacío en sus traducciones.
@@ -62,10 +70,10 @@ Reglas:
 Devuelve SOLO un JSON con estas claves exactas: title_en, desc_en, title_ru, desc_ru.`
 
 type chatRequest struct {
-	Model          string          `json:"model"`
-	Messages       []chatMessage   `json:"messages"`
-	Temperature    float64         `json:"temperature"`
-	ResponseFormat map[string]string `json:"response_format"`
+	Model          string            `json:"model"`
+	Messages       []chatMessage     `json:"messages"`
+	Temperature    float64           `json:"temperature"`
+	ResponseFormat map[string]string `json:"response_format,omitempty"`
 }
 
 type chatMessage struct {
@@ -85,7 +93,7 @@ type chatResponse struct {
 
 // Translate traduce título y descripción en español. Una sola llamada
 // devuelve las cuatro traducciones (EN y RU).
-func (t *Translator) Translate(ctx context.Context, titleES, descES string) (*Translation, error) {
+func (t *Client) Translate(ctx context.Context, titleES, descES string) (*Translation, error) {
 	if !t.Enabled() {
 		return nil, fmt.Errorf("traductor deshabilitado (sin OPENAI_API_KEY)")
 	}
@@ -108,7 +116,7 @@ func (t *Translator) Translate(ctx context.Context, titleES, descES string) (*Tr
 		return nil, err
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", endpoint, bytes.NewReader(reqBody))
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", chatEndpoint, bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}

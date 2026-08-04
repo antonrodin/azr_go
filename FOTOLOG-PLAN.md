@@ -81,7 +81,7 @@ página ligera.
 | 1 | Núcleo privado: esquema, login, subida+pipeline, admin, galería privada | **Alta** | Fable | ✅ Hecha (2026-08-04) |
 | 2 | Zona pública + SEO completo + descargas + licencia | Media | Opus 4.8 | ✅ Hecha (2026-08-04) |
 | 3 | Traducción automática ES→EN/RU (OpenAI) al guardar | Baja | Opus 4.8 | ✅ Hecha (2026-08-04) |
-| 4 | Dictado por voz (MediaRecorder → transcripción → redacción SEO → traducción) | Media | Opus 4.8 | ⬜ |
+| 4 | Dictado por voz (MediaRecorder → transcripción → redacción SEO → traducción) | Media | Opus 4.8 | ✅ Hecha (2026-08-04) |
 
 ### Fase 1 — checklist (hecha; testeada e2e en local con foto JPEG+EXIF+GPS y HEIC)
 - [x] Tabla `photos` creada al arrancar (`PhotoModel.EnsureSchema`, CREATE IF NOT EXISTS)
@@ -168,7 +168,23 @@ Notas para la Fase 4:
   este mismo `autoTranslate` rellena EN/RU. Falta solo el paso audio→texto
   (`whisper-1` o `gpt-4o-mini-transcribe`, ambos ya disponibles en la cuenta).
 
-### Fase 4 — checklist
-- [ ] Botón micro (MediaRecorder) en el form de edición móvil
-- [ ] Audio → transcripción OpenAI → redacción SEO-friendly ES → fase 3 traduce
-- [ ] Todo queda como borrador editable antes de guardar
+### Fase 4 — checklist (hecha; testeada e2e con audio real generado por `say`)
+- [x] Botón "🎤 Dictar" junto a la descripción ES en `admin/foto.go.tmpl`, con JS
+      vanilla (MediaRecorder; elige webm/mp4/ogg según soporte; graba→para)
+- [x] `POST /admin/transcribir`: recibe el audio, `Transcribe` (gpt-4o-mini-transcribe,
+      pista `language=es`) → texto, `Polish` (gpt-4o-mini) → descripción SEO en español
+- [x] El texto rellena el textarea como **borrador** (no guarda); al pulsar Guardar
+      entra el flujo de la Fase 3 y se traduce a EN/RU
+- [x] Si el pulido falla, devuelve la transcripción cruda; si no hay OpenAI o el
+      navegador no soporta MediaRecorder, el botón se deshabilita y el resto va igual
+- [x] Modelo de transcripción configurable con `OPENAI_TRANSCRIBE_MODEL`
+      (por defecto `gpt-4o-mini-transcribe`)
+
+Cliente OpenAI unificado en `internal/openai` (renombrado de `Translator` a `Client`):
+`Translate` (fase 3), `Transcribe` + `Polish` (fase 4). Campo en `AppRepository.OpenAI`.
+
+## Estado final: fotolog completo (fases 0-4 hechas, 2026-08-04)
+Falta solo que Anton use la zona privada con fotos reales. Requisitos de ejecución vivos:
+`vips`/`exiftool` en el servidor, `.env` con S3 + `OPENAI_API_KEY` (+ modelos opcionales),
+servicio `AZR` en la BD de auth. Ver avisos de infra más arriba (bucket dev vs prod,
+sesiones en memoria).

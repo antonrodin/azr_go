@@ -47,6 +47,7 @@ func (app *app) routes() http.Handler {
 		r.Get("/fotos", handlers.App.AdminPhotos)
 		r.Get("/fotos/subir", handlers.App.UploadForm)
 		r.Post("/fotos", handlers.App.UploadPost)
+		r.Post("/transcribir", handlers.App.Transcribe)
 		r.Get("/fotos/{id}", handlers.App.PhotoEditForm)
 		r.Post("/fotos/{id}", handlers.App.PhotoEditPost)
 		r.Post("/fotos/{id}/publicar", handlers.App.PhotoPublish)

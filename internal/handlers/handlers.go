@@ -17,12 +17,12 @@ import (
 var App *AppRepository
 
 type AppRepository struct {
-	Session    *scs.SessionManager
-	Pages      *mysqlite.PageModel
-	Photos     *mysqlite.PhotoModel
-	Storage    *photos.Storage
-	Auth       *authsvc.Client
-	Translator *openai.Translator
+	Session *scs.SessionManager
+	Pages   *mysqlite.PageModel
+	Photos  *mysqlite.PhotoModel
+	Storage *photos.Storage
+	Auth    *authsvc.Client
+	OpenAI  *openai.Client
 }
 
 func NewRepo(a *AppRepository) {

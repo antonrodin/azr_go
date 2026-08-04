@@ -51,6 +51,10 @@
                 </div>
                 <div class="field">
                     <label for="desc_es">Descripción (ES)</label>
+                    <div class="dictate">
+                        <button type="button" class="btn btn-mic" id="mic-btn">🎤 Dictar</button>
+                        <span class="aside" id="mic-status"></span>
+                    </div>
                     <textarea id="desc_es" name="desc_es" rows="4">{{ .DescES }}</textarea>
                 </div>
                 <div class="field">
@@ -109,5 +113,71 @@
         </div>
     </div>
     {{ end }}
+
+    <script>
+    (function () {
+        var btn = document.getElementById('mic-btn');
+        var status = document.getElementById('mic-status');
+        var area = document.getElementById('desc_es');
+        if (!btn || !navigator.mediaDevices || !window.MediaRecorder) {
+            if (btn) { btn.disabled = true; btn.title = 'Tu navegador no soporta grabación'; }
+            return;
+        }
+
+        var recorder = null, chunks = [], recording = false;
+
+        function pickMime() {
+            var types = ['audio/webm', 'audio/mp4', 'audio/ogg'];
+            for (var i = 0; i < types.length; i++) {
+                if (MediaRecorder.isTypeSupported(types[i])) return types[i];
+            }
+            return '';
+        }
+
+        btn.addEventListener('click', async function () {
+            if (recording) { recorder.stop(); return; }
+            try {
+                var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                var mime = pickMime();
+                recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+                chunks = [];
+                recorder.ondataavailable = function (e) { if (e.data.size) chunks.push(e.data); };
+                recorder.onstop = async function () {
+                    stream.getTracks().forEach(function (t) { t.stop(); });
+                    recording = false;
+                    btn.textContent = '🎤 Dictar';
+                    btn.classList.remove('recording');
+                    var blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+                    status.textContent = 'Transcribiendo…';
+                    btn.disabled = true;
+                    try {
+                        var fd = new FormData();
+                        fd.append('audio', blob, 'audio');
+                        var resp = await fetch('/admin/transcribir', {
+                            method: 'POST', body: fd, headers: { 'Accept': 'application/json' }
+                        });
+                        var data = await resp.json();
+                        if (data.ok) {
+                            area.value = area.value.trim() ? (area.value.trim() + '\n\n' + data.text) : data.text;
+                            status.textContent = '✔ Listo. Revísalo y guarda.';
+                        } else {
+                            status.textContent = '✘ ' + (data.error || 'error');
+                        }
+                    } catch (err) {
+                        status.textContent = '✘ error de red: ' + err.message;
+                    }
+                    btn.disabled = false;
+                };
+                recorder.start();
+                recording = true;
+                btn.textContent = '⏹ Parar';
+                btn.classList.add('recording');
+                status.textContent = 'Grabando… habla y pulsa Parar.';
+            } catch (err) {
+                status.textContent = '✘ sin acceso al micrófono: ' + err.message;
+            }
+        });
+    })();
+    </script>
 </main>
 {{ end }}

@@ -88,13 +88,14 @@ func run() error {
 	}
 	log.Println("S3 storage ready.")
 
-	// Traductor OpenAI (Fase 3). Sin OPENAI_API_KEY queda deshabilitado y el
-	// admin simplemente no autotraduce; el resto funciona igual.
-	translator := openai.NewTranslator(os.Getenv("OPENAI_API_KEY"), os.Getenv("OPENAI_MODEL"))
-	if translator.Enabled() {
-		log.Println("OpenAI translator ready.")
+	// Cliente OpenAI (Fases 3 y 4: traducir y transcribir voz). Sin
+	// OPENAI_API_KEY queda deshabilitado y el admin simplemente no ofrece esas
+	// funciones; el resto funciona igual.
+	oai := openai.NewClient(os.Getenv("OPENAI_API_KEY"), os.Getenv("OPENAI_MODEL"), os.Getenv("OPENAI_TRANSCRIBE_MODEL"))
+	if oai.Enabled() {
+		log.Println("OpenAI client ready.")
 	} else {
-		log.Println("OpenAI translator disabled (no OPENAI_API_KEY).")
+		log.Println("OpenAI client disabled (no OPENAI_API_KEY).")
 	}
 
 	app := app{
@@ -102,12 +103,12 @@ func run() error {
 	}
 
 	appRepo := handlers.AppRepository{
-		Session:    session,
-		Pages:      &mysqlite.PageModel{DB: db},
-		Photos:     photoModel,
-		Storage:    storage,
-		Auth:       authsvc.New(authService, "azr"),
-		Translator: translator,
+		Session: session,
+		Pages:   &mysqlite.PageModel{DB: db},
+		Photos:  photoModel,
+		Storage: storage,
+		Auth:    authsvc.New(authService, "azr"),
+		OpenAI:  oai,
 	}
 
 	handlers.NewRepo(&appRepo)

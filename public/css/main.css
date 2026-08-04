@@ -453,3 +453,26 @@ a:hover {
     font-size: .82rem;
     word-break: break-word;
 }
+
+/* Dictado por voz */
+.dictate {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: .4rem;
+}
+
+.btn-mic {
+    background: #fff;
+    color: var(--ink);
+    padding: .3rem .8rem;
+    font-size: .85rem;
+}
+
+.btn-mic:hover { background: #f3f3f3; }
+
+.btn-mic.recording {
+    background: #b00020;
+    border-color: #b00020;
+    color: #fff;
+}

@@ -367,7 +367,7 @@ func (app *AppRepository) PhotoEditPost(w http.ResponseWriter, r *http.Request) 
 // mensaje por defecto). Nunca falla el guardado: si la API se cae, avisa y
 // deja los textos como estaban.
 func (app *AppRepository) autoTranslate(r *http.Request, p *models.Photo, overwrite bool) string {
-	if !app.Translator.Enabled() {
+	if !app.OpenAI.Enabled() {
 		return ""
 	}
 	// Nada que traducir si no hay origen en español.
@@ -384,7 +384,7 @@ func (app *AppRepository) autoTranslate(r *http.Request, p *models.Photo, overwr
 		return ""
 	}
 
-	tr, err := app.Translator.Translate(r.Context(), p.TitleES, p.DescES)
+	tr, err := app.OpenAI.Translate(r.Context(), p.TitleES, p.DescES)
 	if err != nil {
 		log.Println("autotraducción:", err)
 		return "Guardado, pero la traducción automática falló (revísalo o reintenta)."
@@ -408,6 +408,90 @@ func (app *AppRepository) autoTranslate(r *http.Request, p *models.Photo, overwr
 		return "Guardado y retraducido a inglés y ruso."
 	}
 	return "Guardado y traducido a inglés y ruso."
+}
+
+// --- Dictado por voz (Fase 4) ---
+
+// maxAudioBytes es el límite de OpenAI para transcripción.
+const maxAudioBytes = 25 << 20 // 25 MB
+
+var audioExts = map[string]bool{
+	"webm": true, "mp4": true, "m4a": true, "mp3": true,
+	"wav": true, "ogg": true, "oga": true, "mpeg": true, "mpga": true, "flac": true,
+}
+
+// Transcribe recibe un audio grabado en el navegador, lo transcribe a español
+// y lo pule en plan SEO. Devuelve JSON {ok, text} para que el JS rellene el
+// textarea como borrador (no guarda nada).
+func (app *AppRepository) Transcribe(w http.ResponseWriter, r *http.Request) {
+	if !app.OpenAI.Enabled() {
+		jsonError(w, http.StatusServiceUnavailable, "Transcripción no disponible (sin OpenAI).")
+		return
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxAudioBytes)
+	if err := r.ParseMultipartForm(4 << 20); err != nil {
+		jsonError(w, http.StatusRequestEntityTooLarge, "El audio es demasiado grande (máx. 25 MB).")
+		return
+	}
+
+	file, header, err := r.FormFile("audio")
+	if err != nil {
+		jsonError(w, http.StatusBadRequest, "No ha llegado audio.")
+		return
+	}
+	defer file.Close()
+
+	text, err := app.OpenAI.Transcribe(r.Context(), file, transcribeFilename(header.Filename, header.Header.Get("Content-Type")))
+	if err != nil {
+		log.Println("transcribir:", err)
+		jsonError(w, http.StatusBadGateway, "No se pudo transcribir: "+err.Error())
+		return
+	}
+	if text == "" {
+		jsonError(w, http.StatusUnprocessableEntity, "No se entendió nada en el audio. Repite más claro.")
+		return
+	}
+
+	// Pulir en plan SEO; si el pulido falla, devolvemos la transcripción cruda.
+	polished, perr := app.OpenAI.Polish(r.Context(), text)
+	if perr != nil || polished == "" {
+		if perr != nil {
+			log.Println("pulir:", perr)
+		}
+		polished = text
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "text": polished})
+}
+
+// transcribeFilename da a OpenAI un nombre con extensión válida para que
+// detecte el formato del audio.
+func transcribeFilename(orig, contentType string) string {
+	if ext := strings.ToLower(strings.TrimPrefix(filepath.Ext(orig), ".")); audioExts[ext] {
+		return "audio." + ext
+	}
+	switch {
+	case strings.Contains(contentType, "webm"):
+		return "audio.webm"
+	case strings.Contains(contentType, "mp4"), strings.Contains(contentType, "m4a"), strings.Contains(contentType, "aac"):
+		return "audio.mp4"
+	case strings.Contains(contentType, "ogg"):
+		return "audio.ogg"
+	case strings.Contains(contentType, "wav"):
+		return "audio.wav"
+	case strings.Contains(contentType, "mpeg"), strings.Contains(contentType, "mp3"):
+		return "audio.mp3"
+	default:
+		return "audio.webm"
+	}
+}
+
+func jsonError(w http.ResponseWriter, status int, msg string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]interface{}{"ok": false, "error": msg})
 }
 
 // --- Publicar / Despublicar / Borrar ---
