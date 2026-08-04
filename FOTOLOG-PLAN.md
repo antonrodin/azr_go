@@ -217,6 +217,20 @@ debajo. Cabecera `.fotolog-bar` con `flex-wrap` para no desbordarse en móvil.
   es fiel. Para iterar sin desplegar: preview HTML local que apunta a la CSS real y a la
   URL pública S3 de una foto real. No hay MCP de Chrome/Playwright en el entorno.
 
+## Galería con layout de la portada (2026-08-04)
+La galería del fotolog ahora usa el MISMO layout de dos columnas que la home
+(`.page > .grid`): barra lateral de branding a la izquierda + fotos (feed) a la derecha.
+- El branding (`aside.brand`) se extrajo a **`templates/partials/brand.go.tmpl`**
+  (`{{ define "components/brand" }}`), registrado en `tmpl.Get`. Lo comparten home y
+  fotolog vía `brandView` (en `handlers.go`), que embebe `i18n.Content` (claims, redes,
+  FotologURL) y añade los destinos del conmutador de idioma (dependen de la página) y el
+  botón opcional "Subir foto" (`ShowUpload`/`UploadURL`). Helper `makeBrand(...)`.
+- Home pasa `homePage{Content, Brand}`; fotolog pasa `galleryPage{..., Brand}`.
+- Botón "Subir foto" alineado con el logo en `.brand-top` (solo en el fotolog).
+- El conmutador de idioma del fotolog apunta a las variantes del fotolog; en la home a la
+  home. La página de detalle (`show.go.tmpl`) sigue con su cabecera propia (no migrada aún;
+  candidata a usar también la barra lateral si se quiere consistencia total).
+
 ## Estado final: fotolog completo (fases 0-4 hechas, 2026-08-04)
 Falta solo que Anton use la zona privada con fotos reales. Requisitos de ejecución vivos:
 `vips`/`exiftool` en el servidor, `.env` con S3 + `OPENAI_API_KEY` (+ modelos opcionales),
