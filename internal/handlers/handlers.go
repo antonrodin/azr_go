@@ -30,6 +30,39 @@ func NewRepo(a *AppRepository) {
 	App = a
 }
 
+// brandView alimenta la barra lateral de branding (partial "components/brand"),
+// compartida entre la portada y el fotolog. Embebe i18n.Content para exponer
+// los claims y enlaces; añade los destinos del conmutador de idioma (que
+// dependen de la página) y el botón opcional "Subir foto".
+type brandView struct {
+	i18n.Content
+	LangES     string
+	LangEN     string
+	LangRU     string
+	ShowUpload bool
+	UploadURL  string
+}
+
+// makeBrand construye la barra lateral. es/en/ru son los destinos del
+// conmutador de idioma para la página actual.
+func makeBrand(c i18n.Content, es, en, ru string, showUpload bool) brandView {
+	return brandView{
+		Content:    c,
+		LangES:     es,
+		LangEN:     en,
+		LangRU:     ru,
+		ShowUpload: showUpload,
+		UploadURL:  "/admin/fotos/subir",
+	}
+}
+
+// homePage es el dato de la portada: el contenido i18n (promovido para las
+// plantillas) más la barra lateral.
+type homePage struct {
+	i18n.Content
+	Brand brandView
+}
+
 func (app *AppRepository) Home(w http.ResponseWriter, r *http.Request) {
 	// El idioma viene del segmento de ruta ({lang}); si no hay, usamos el
 	// idioma por defecto (español, ruta "/").
@@ -44,7 +77,12 @@ func (app *AppRepository) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := tmpl.Get("home.go.tmpl").Execute(w, c)
+	data := homePage{
+		Content: c,
+		Brand:   makeBrand(c, "/", "/en", "/ru", false),
+	}
+
+	err := tmpl.Get("home.go.tmpl").Execute(w, data)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

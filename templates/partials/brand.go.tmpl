@@ -1,0 +1,33 @@
+{{ define "components/brand" }}
+<aside class="brand">
+    <div class="brand-top">
+        <div class="monogram">AZR</div>
+        {{ if .ShowUpload }}<a class="btn-upload" href="{{ .UploadURL }}">Subir foto</a>{{ end }}
+    </div>
+    <picture>
+        <source srcset="/public/img/azr.webp" type="image/webp">
+        <img src="/public/img/azr.jpg" alt="Antón Zekeriev Rodin" class="photo" width="1200" height="900">
+    </picture>
+    <h1>Antón Zekeriev Rodin</h1>
+    <ul class="claims">
+        <li>{{ .ClaimFather }}</li>
+        <li>{{ .ClaimSWE }}</li>
+        <li>{{ .ClaimAI }} <span class="aside">{{ .ClaimAIAside }}</span>.</li>
+        <li>{{ .ClaimWorks }} <span class="aside">{{ .ClaimWorksAside }}</span>.</li>
+    </ul>
+    <ul class="social">
+        <li><a href="{{ .FotologURL }}">{{ .FotologNav }}</a></li>
+        <li><a href="https://github.com/antonrodin" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://www.youtube.com/c/AZRMedia" target="_blank" rel="noopener">YouTube</a></li>
+        <li><a href="https://www.linkedin.com/in/azrodin/" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://www.credly.com/users/anton-zekeriev-rodin" target="_blank" rel="noopener">Credly</a></li>
+        <li><a href="https://www.azrodin.com/" target="_blank" rel="noopener">Blog</a></li>
+        <li><a href="mailto:azr@azr.es">azr@azr.es</a></li>
+    </ul>
+    <nav class="langs" aria-label="Idioma">
+        <a href="{{ .LangES }}" {{ if eq .Lang "es" }}class="active" aria-current="true"{{ end }}>ES</a>
+        <a href="{{ .LangEN }}" {{ if eq .Lang "en" }}class="active" aria-current="true"{{ end }}>EN</a>
+        <a href="{{ .LangRU }}" {{ if eq .Lang "ru" }}class="active" aria-current="true"{{ end }}>RU</a>
+    </nav>
+</aside>
+{{ end }}

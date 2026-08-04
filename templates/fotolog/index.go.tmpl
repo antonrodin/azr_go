@@ -20,45 +20,42 @@
 {{ end }}
 
 {{ define "content" }}
-<div class="fotolog">
-    <header class="fotolog-head">
-        <div class="fotolog-bar">
-            <a href="/" class="monogram">AZR</a>
-            <span class="fotolog-actions">
-                <a class="btn-upload" href="/admin/fotos/subir">Subir foto</a>
-                <span class="langs">
-                    <a href="{{ .LangES }}" {{ if eq .Lang "es" }}class="active" aria-current="true"{{ end }}>ES</a>
-                    <a href="{{ .LangEN }}" {{ if eq .Lang "en" }}class="active" aria-current="true"{{ end }}>EN</a>
-                    <a href="{{ .LangRU }}" {{ if eq .Lang "ru" }}class="active" aria-current="true"{{ end }}>RU</a>
-                </span>
-            </span>
-        </div>
-        <h1>{{ .T.GalleryH1 }}</h1>
-        <p class="fotolog-intro">{{ .T.GalleryIntro }}</p>
-    </header>
+<main class="page">
+    <div class="grid">
 
-    {{ if not .Photos }}
-    <p class="fotolog-empty">{{ .T.Empty }}</p>
-    {{ else }}
-    <div class="feed">
-        {{ range .Photos }}
-        <figure class="feed-item">
-            <a href="{{ .Href }}">
-                <img src="{{ .Src }}" srcset="{{ .SrcSet }}" sizes="(max-width: 640px) 100vw, 600px"
-                     alt="{{ .Title }}" loading="lazy"
-                     {{ if and .Width .Height }}width="{{ .Width }}" height="{{ .Height }}"{{ end }}>
-            </a>
-            {{ if .Title }}<figcaption><a href="{{ .Href }}">{{ .Title }}</a></figcaption>{{ end }}
-        </figure>
-        {{ end }}
+        <!-- Columna 1: Branding (igual que la portada) -->
+        {{ template "components/brand" .Brand }}
+
+        <!-- Columna 2: Fotos -->
+        <section class="fotolog-main">
+            <h2>{{ .T.GalleryH1 }}</h2>
+            <p class="lead-note">{{ .T.GalleryIntro }}</p>
+
+            {{ if not .Photos }}
+            <p class="fotolog-empty">{{ .T.Empty }}</p>
+            {{ else }}
+            <div class="feed">
+                {{ range .Photos }}
+                <figure class="feed-item">
+                    <a href="{{ .Href }}">
+                        <img src="{{ .Src }}" srcset="{{ .SrcSet }}" sizes="(max-width: 720px) 100vw, 600px"
+                             alt="{{ .Title }}" loading="lazy"
+                             {{ if and .Width .Height }}width="{{ .Width }}" height="{{ .Height }}"{{ end }}>
+                    </a>
+                    {{ if .Title }}<figcaption><a href="{{ .Href }}">{{ .Title }}</a></figcaption>{{ end }}
+                </figure>
+                {{ end }}
+            </div>
+
+            {{ if or .PrevURL .NextURL }}
+            <nav class="fotolog-pager">
+                {{ if .PrevURL }}<a href="{{ .PrevURL }}">{{ .T.Prev }}</a>{{ else }}<span></span>{{ end }}
+                {{ if .NextURL }}<a href="{{ .NextURL }}">{{ .T.Next }}</a>{{ else }}<span></span>{{ end }}
+            </nav>
+            {{ end }}
+            {{ end }}
+        </section>
+
     </div>
-
-    {{ if or .PrevURL .NextURL }}
-    <nav class="fotolog-pager">
-        {{ if .PrevURL }}<a href="{{ .PrevURL }}">{{ .T.Prev }}</a>{{ else }}<span></span>{{ end }}
-        {{ if .NextURL }}<a href="{{ .NextURL }}">{{ .T.Next }}</a>{{ else }}<span></span>{{ end }}
-    </nav>
-    {{ end }}
-    {{ end }}
-</div>
+</main>
 {{ end }}

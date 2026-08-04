@@ -359,40 +359,25 @@ a:hover {
 
 /* ===== Fotolog público ===== */
 
-/* Contenedor centrado y estrecho: las fotos mandan, todo lo demás se aparta. */
-.fotolog {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 3rem 1.25rem 4rem;
-}
-
-/* Cabecera: barra superior + título + intro. La barra envuelve en móvil
-   para no desbordarse nunca. */
-.fotolog-bar {
+/* Fila superior de la barra lateral: logo + botón "Subir foto" alineado con él. */
+.brand-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: .75rem 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-}
-
-.fotolog-actions {
-    display: flex;
-    align-items: center;
     gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.fotolog-head h1 {
-    font-size: 1.9rem;
+.brand-top .monogram { margin-bottom: 0; }
+
+/* Columna de fotos: encabezado como el de "Skills" en la portada. */
+.fotolog-main h2 {
+    font-size: .8rem;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    margin: 0 0 .4rem;
-}
-
-.fotolog-intro {
+    text-transform: uppercase;
+    letter-spacing: .12em;
     color: var(--muted);
-    margin: 0 0 1rem;
+    margin: 0 0 .5rem;
 }
 
 .fotolog-empty {
@@ -400,9 +385,9 @@ a:hover {
     padding: 2rem 0;
 }
 
-/* Feed: una columna, fotos a su proporción real, grandes y nítidas. */
+/* Feed: fotos a su proporción real, grandes y nítidas, dentro de la columna. */
 .feed {
-    margin-top: 2.5rem;
+    margin-top: 0;
 }
 
 .feed-item {
@@ -451,6 +436,12 @@ a:hover {
     gap: .75rem 1rem;
     flex-wrap: wrap;
     margin-bottom: 2rem;
+}
+
+.fotolog-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 /* Detalle */

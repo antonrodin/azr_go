@@ -102,6 +102,7 @@ type galleryPhoto struct {
 
 type galleryPage struct {
 	Lang      string // para <html lang> del layout
+	Brand     brandView
 	T         i18n.FotologText
 	Canonical string
 	Photos    []galleryPhoto
@@ -155,8 +156,12 @@ func (app *AppRepository) Fotolog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Barra lateral compartida con la portada, con los datos del idioma actual.
+	c, _ := i18n.Get(lang)
+
 	data := galleryPage{
 		Lang:      lang,
+		Brand:     makeBrand(c, galleryPath("es", page), galleryPath("en", page), galleryPath("ru", page), true),
 		T:         t,
 		Canonical: siteBase + galleryPath(lang, page),
 		LangES:    galleryPath("es", page),

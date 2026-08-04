@@ -44,6 +44,7 @@ func Get(path string) *template.Template {
 		"./templates/partials/header.go.tmpl",
 		"./templates/partials/footer.go.tmpl",
 		"./templates/partials/sidebar.go.tmpl",
+		"./templates/partials/brand.go.tmpl",
 		"./templates/layouts/app.go.tmpl",
 	)
 
