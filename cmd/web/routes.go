@@ -53,6 +53,10 @@ func (app *app) routes() http.Handler {
 		r.Post("/fotos/{id}/publicar", handlers.App.PhotoPublish)
 		r.Post("/fotos/{id}/despublicar", handlers.App.PhotoUnpublish)
 		r.Post("/fotos/{id}/borrar", handlers.App.PhotoDelete)
+
+		r.Get("/prompts", handlers.App.PromptsList)
+		r.Post("/prompts/{key}", handlers.App.PromptUpdate)
+		r.Post("/prompts/{key}/reset", handlers.App.PromptReset)
 	})
 
 	// Static files

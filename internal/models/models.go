@@ -46,3 +46,15 @@ type Photo struct {
 	OrigBytes  int64
 	ExifJSON   string // volcado completo de exiftool -json
 }
+
+// Prompt son las instrucciones editables que se pasan a la IA (traducción,
+// dictado…). Se guardan en SQLite y se pueden editar desde /admin/prompts.
+// Content son SOLO las instrucciones de estilo/reglas; el contrato de salida
+// (qué JSON devolver) lo añade el código, no es editable.
+type Prompt struct {
+	Key         string // identificador estable (translate, dictate…)
+	Label       string // nombre para la UI
+	Description string // ayuda para la UI
+	Content     string // instrucciones editables
+	UpdatedAt   string
+}

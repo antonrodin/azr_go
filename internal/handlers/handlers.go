@@ -20,6 +20,7 @@ type AppRepository struct {
 	Session *scs.SessionManager
 	Pages   *mysqlite.PageModel
 	Photos  *mysqlite.PhotoModel
+	Prompts *mysqlite.PromptModel
 	Storage *photos.Storage
 	Auth    *authsvc.Client
 	OpenAI  *openai.Client

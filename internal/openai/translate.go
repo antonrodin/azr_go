@@ -58,16 +58,20 @@ type Translation struct {
 	DescRU  string `json:"desc_ru"`
 }
 
-const systemPrompt = `Eres el traductor de un fotolog personal. Traduce el título y la descripción de una foto del español a inglés y ruso.
+// DefaultTranslateInstructions son las instrucciones editables por defecto de
+// la traducción. NO incluyen el contrato de salida (JSON), que se añade aparte.
+const DefaultTranslateInstructions = `Eres el traductor de un fotolog personal. Traduce el título y la descripción de una foto del español a inglés y ruso.
 
 Reglas:
 - Traducción natural y fluida, como la escribiría un nativo, no literal.
 - Conserva el tono del original (puede ser desenfadado, irónico o con humor).
 - Texto claro y SEO-friendly: natural, sin repetir palabras clave de forma artificial.
 - No añadas comillas, ni prefijos, ni comentarios; solo el texto traducido.
-- Si un campo de origen viene vacío, devuelve cadena vacía en sus traducciones.
+- Si un campo de origen viene vacío, devuelve cadena vacía en sus traducciones.`
 
-Devuelve SOLO un JSON con estas claves exactas: title_en, desc_en, title_ru, desc_ru.`
+// translateFormat es el contrato de salida (no editable): garantiza el JSON que
+// el código sabe parsear, pase lo que pase con las instrucciones.
+const translateFormat = "\n\nDevuelve SOLO un JSON con estas claves exactas: title_en, desc_en, title_ru, desc_ru."
 
 type chatRequest struct {
 	Model          string            `json:"model"`
@@ -92,10 +96,14 @@ type chatResponse struct {
 }
 
 // Translate traduce título y descripción en español. Una sola llamada
-// devuelve las cuatro traducciones (EN y RU).
-func (t *Client) Translate(ctx context.Context, titleES, descES string) (*Translation, error) {
+// devuelve las cuatro traducciones (EN y RU). instructions son las reglas
+// editables; si viene vacío se usan las de por defecto.
+func (t *Client) Translate(ctx context.Context, instructions, titleES, descES string) (*Translation, error) {
 	if !t.Enabled() {
 		return nil, fmt.Errorf("traductor deshabilitado (sin OPENAI_API_KEY)")
+	}
+	if instructions == "" {
+		instructions = DefaultTranslateInstructions
 	}
 
 	input, err := json.Marshal(map[string]string{"title_es": titleES, "desc_es": descES})
@@ -106,7 +114,7 @@ func (t *Client) Translate(ctx context.Context, titleES, descES string) (*Transl
 	reqBody, err := json.Marshal(chatRequest{
 		Model: t.model,
 		Messages: []chatMessage{
-			{Role: "system", Content: systemPrompt},
+			{Role: "system", Content: instructions + translateFormat},
 			{Role: "user", Content: string(input)},
 		},
 		Temperature:    0.3,

@@ -1,0 +1,38 @@
+{{ template "app" . }}
+
+{{ define "metadata" }}
+<title>Prompts — admin</title>
+<meta name="robots" content="noindex, nofollow" />
+{{ end }}
+
+{{ define "content" }}
+<main class="page">
+    <nav class="admin-bar">
+        <span class="monogram">AZR · PROMPTS</span>
+        <span><a href="/admin/fotos">← Fotos</a></span>
+    </nav>
+
+    <h1>Prompts de la IA</h1>
+    <p class="lead-note">Instrucciones que se le dan a la IA. Puedes cambiar el tono y las reglas; el formato de salida (el JSON que la app necesita) se añade solo por debajo, así que no lo puedes romper.</p>
+
+    {{ if .Flash }}<p class="flash">{{ .Flash }}</p>{{ end }}
+
+    {{ range .Prompts }}
+    <section class="prompt-block">
+        <h2>{{ .Label }}</h2>
+        <p class="aside">{{ .Description }}</p>
+        <form method="POST" action="/admin/prompts/{{ .Key }}" class="admin-form">
+            <textarea name="content" rows="10">{{ .Content }}</textarea>
+            <div class="prompt-actions">
+                <button type="submit" class="btn">Guardar</button>
+                <span class="aside">Última edición: {{ .UpdatedAt }}</span>
+            </div>
+        </form>
+        <form method="POST" action="/admin/prompts/{{ .Key }}/reset"
+              onsubmit="return confirm('¿Restaurar este prompt al valor por defecto? Se pierde tu versión.');">
+            <button type="submit" class="btn btn-danger">Restaurar por defecto</button>
+        </form>
+    </section>
+    {{ end }}
+</main>
+{{ end }}

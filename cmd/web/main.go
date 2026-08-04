@@ -82,6 +82,14 @@ func run() error {
 		return fmt.Errorf("crear esquema de photos: %w", err)
 	}
 
+	promptModel := &mysqlite.PromptModel{DB: db}
+	if err := promptModel.EnsureSchema(); err != nil {
+		return fmt.Errorf("crear esquema de prompts: %w", err)
+	}
+	if err := promptModel.Seed(handlers.PromptRegistry); err != nil {
+		return fmt.Errorf("sembrar prompts: %w", err)
+	}
+
 	storage, err := photos.NewStorage(context.Background())
 	if err != nil {
 		return fmt.Errorf("almacenamiento S3: %w", err)
@@ -106,6 +114,7 @@ func run() error {
 		Session: session,
 		Pages:   &mysqlite.PageModel{DB: db},
 		Photos:  photoModel,
+		Prompts: promptModel,
 		Storage: storage,
 		Auth:    authsvc.New(authService, "azr"),
 		OpenAI:  oai,

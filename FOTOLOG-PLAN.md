@@ -189,6 +189,22 @@ Notas para la Fase 4:
 Cliente OpenAI unificado en `internal/openai` (renombrado de `Translator` a `Client`):
 `Translate` (fase 3), `Transcribe` + `Polish` (fase 4). Campo en `AppRepository.OpenAI`.
 
+## Extras posteriores (2026-08-04)
+- **Botón "Subir foto"** en la barra del fotolog + redirect post-login (`next`).
+- **nginx** `client_max_body_size 100M` (ver avisos de infra).
+- **Dictado rellena también el título**: la transcripción pasa por `Compose`
+  (antes `Polish`), que devuelve `{title, description}`; el JS rellena `title_es`
+  si está vacío. Facilita publicar (publicar exige título ES).
+- **Prompts editables desde `/admin/prompts`** (tabla `prompts` en SQLite):
+  - Registro en `handlers/prompts.go` (`PromptRegistry`, claves `translate`/`dictate`);
+    se siembra al arrancar (`PromptModel.Seed`, no pisa ediciones).
+  - Solo se edita la parte de **instrucciones**; el contrato JSON de salida
+    (`translateFormat`/`composeFormat` en `internal/openai`) se añade en código y NO es
+    editable, para no romper el parseo. Verificado que editar el prompt cambia la salida.
+  - `Translate`/`Compose` reciben las instrucciones por parámetro; el handler las carga
+    con `promptOr(key, default)` (cae al default si falta BD o está vacío).
+  - Añadir un prompt nuevo = nueva entrada en `PromptRegistry` + usar su clave.
+
 ## Estado final: fotolog completo (fases 0-4 hechas, 2026-08-04)
 Falta solo que Anton use la zona privada con fotos reales. Requisitos de ejecución vivos:
 `vips`/`exiftool` en el servidor, `.env` con S3 + `OPENAI_API_KEY` (+ modelos opcionales),

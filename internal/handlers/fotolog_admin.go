@@ -15,6 +15,7 @@ import (
 
 	"github.com/antonrodin/azr/internal/authsvc"
 	"github.com/antonrodin/azr/internal/models"
+	"github.com/antonrodin/azr/internal/openai"
 	"github.com/antonrodin/azr/internal/photos"
 	"github.com/antonrodin/azr/internal/tmpl"
 	"github.com/go-chi/chi/v5"
@@ -400,7 +401,8 @@ func (app *AppRepository) autoTranslate(r *http.Request, p *models.Photo, overwr
 		return ""
 	}
 
-	tr, err := app.OpenAI.Translate(r.Context(), p.TitleES, p.DescES)
+	instr := app.promptOr(PromptTranslate, openai.DefaultTranslateInstructions)
+	tr, err := app.OpenAI.Translate(r.Context(), instr, p.TitleES, p.DescES)
 	if err != nil {
 		log.Println("autotraducción:", err)
 		return "Guardado, pero la traducción automática falló (revísalo o reintenta)."
@@ -469,17 +471,21 @@ func (app *AppRepository) Transcribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Pulir en plan SEO; si el pulido falla, devolvemos la transcripción cruda.
-	polished, perr := app.OpenAI.Polish(r.Context(), text)
-	if perr != nil || polished == "" {
-		if perr != nil {
-			log.Println("pulir:", perr)
+	// Componer título + descripción a partir del dictado. Si falla, devolvemos
+	// la transcripción cruda como descripción y sin título.
+	instr := app.promptOr(PromptDictate, openai.DefaultComposeInstructions)
+	title, desc := "", text
+	if comp, cerr := app.OpenAI.Compose(r.Context(), instr, text); cerr != nil {
+		log.Println("dictado (compose):", cerr)
+	} else if comp != nil {
+		title = comp.Title
+		if comp.Description != "" {
+			desc = comp.Description
 		}
-		polished = text
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "text": polished})
+	json.NewEncoder(w).Encode(map[string]interface{}{"ok": true, "title": title, "text": desc})
 }
 
 // transcribeFilename da a OpenAI un nombre con extensión válida para que

@@ -68,61 +68,84 @@ func (t *Client) Transcribe(ctx context.Context, audio io.Reader, filename strin
 	return strings.TrimSpace(out.Text), nil
 }
 
-const polishPrompt = `Eres el editor de un fotolog personal. Te paso una descripción de una foto dictada por voz: puede traer muletillas, repeticiones, errores de transcripción o frases sin rematar.
+// DefaultComposeInstructions son las instrucciones editables por defecto del
+// dictado: convierten la voz cruda en un título y una descripción. NO incluyen
+// el contrato de salida (JSON), que se añade aparte.
+const DefaultComposeInstructions = `Eres el editor de un fotolog personal. Te paso una descripción de una foto dictada por voz: puede traer muletillas, repeticiones, errores de transcripción o frases sin rematar.
 
-Reescríbela como una descripción de foto lista para publicar:
-- En español, clara, natural y bien redactada.
-- SEO-friendly: lenguaje natural, sin repetir palabras clave de forma artificial.
+A partir de ella genera dos cosas:
+- Un título corto (entre 3 y 6 palabras), claro y con gancho.
+- Una descripción lista para publicar: en español, natural, bien redactada y SEO-friendly (sin repetir palabras clave de forma artificial).
+
+Reglas:
 - Conserva el tono y el contenido; corrige lo que haga falta.
-- NO inventes datos que no estén en el dictado (lugares, fechas, nombres).
-- Devuelve SOLO el texto final, sin comillas ni comentarios.`
+- NO inventes datos que no estén en el dictado (lugares, fechas, nombres).`
 
-// Polish limpia y reescribe en plan SEO una descripción en español (p. ej.
-// la salida cruda de una transcripción de voz).
-func (t *Client) Polish(ctx context.Context, raw string) (string, error) {
+// composeFormat es el contrato de salida (no editable).
+const composeFormat = "\n\nDevuelve SOLO un JSON con estas claves exactas: title, description."
+
+// Composition es el resultado del dictado: título y descripción en español.
+type Composition struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
+// Compose convierte una transcripción cruda (voz en español) en un título y una
+// descripción listos para publicar. instructions son las reglas editables.
+func (t *Client) Compose(ctx context.Context, instructions, raw string) (*Composition, error) {
 	if !t.Enabled() {
-		return "", fmt.Errorf("OpenAI deshabilitado (sin OPENAI_API_KEY)")
+		return nil, fmt.Errorf("OpenAI deshabilitado (sin OPENAI_API_KEY)")
 	}
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
-		return "", nil
+		return &Composition{}, nil
+	}
+	if instructions == "" {
+		instructions = DefaultComposeInstructions
 	}
 
 	reqBody, err := json.Marshal(chatRequest{
 		Model: t.model,
 		Messages: []chatMessage{
-			{Role: "system", Content: polishPrompt},
+			{Role: "system", Content: instructions + composeFormat},
 			{Role: "user", Content: raw},
 		},
-		Temperature: 0.4,
+		Temperature:    0.4,
+		ResponseFormat: map[string]string{"type": "json_object"},
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST", chatEndpoint, bytes.NewReader(reqBody))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+t.apiKey)
 
 	resp, err := t.http.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("pulido OpenAI: %w", err)
+		return nil, fmt.Errorf("dictado OpenAI: %w", err)
 	}
 	defer resp.Body.Close()
 
 	var cr chatResponse
 	if err := json.NewDecoder(resp.Body).Decode(&cr); err != nil {
-		return "", fmt.Errorf("respuesta de pulido ilegible: %w", err)
+		return nil, fmt.Errorf("respuesta de dictado ilegible: %w", err)
 	}
 	if cr.Error != nil {
-		return "", fmt.Errorf("OpenAI (%s): %s", cr.Error.Code, cr.Error.Message)
+		return nil, fmt.Errorf("OpenAI (%s): %s", cr.Error.Code, cr.Error.Message)
 	}
 	if len(cr.Choices) == 0 {
-		return "", fmt.Errorf("OpenAI no devolvió resultado")
+		return nil, fmt.Errorf("OpenAI no devolvió resultado")
 	}
 
-	return strings.TrimSpace(cr.Choices[0].Message.Content), nil
+	var out Composition
+	if err := json.Unmarshal([]byte(cr.Choices[0].Message.Content), &out); err != nil {
+		return nil, fmt.Errorf("JSON de dictado inválido: %w", err)
+	}
+	out.Title = strings.TrimSpace(out.Title)
+	out.Description = strings.TrimSpace(out.Description)
+	return &out, nil
 }

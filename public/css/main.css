@@ -502,3 +502,36 @@ a:hover {
     .fotolog-actions { gap: .6rem; }
     .btn-upload { padding: .3rem .7rem; }
 }
+
+/* Editor de prompts */
+.prompt-block {
+    margin: 2rem 0;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--rule);
+}
+
+.prompt-block h2 {
+    font-size: 1.1rem;
+    margin-bottom: .2rem;
+}
+
+.prompt-block textarea {
+    width: 100%;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: .7rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85rem;
+    line-height: 1.5;
+    color: var(--ink);
+    background: #fff;
+}
+
+.prompt-block textarea:focus { outline: none; border-color: var(--ink); }
+
+.prompt-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: .6rem 0 1rem;
+}

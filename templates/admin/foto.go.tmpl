@@ -161,6 +161,10 @@
                         var data = await resp.json();
                         if (data.ok) {
                             area.value = area.value.trim() ? (area.value.trim() + '\n\n' + data.text) : data.text;
+                            var titleInput = document.getElementById('title_es');
+                            if (data.title && titleInput && !titleInput.value.trim()) {
+                                titleInput.value = data.title;
+                            }
                             status.textContent = '✔ Listo. Revísalo y guarda.';
                         } else {
                             status.textContent = '✘ ' + (data.error || 'error');
