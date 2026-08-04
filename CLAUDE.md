@@ -2,6 +2,10 @@
 
 Web personal de **azr.es** (sitio de Anton Zekeriev Rodin). Aplicación web en **Go** con renderizado server-side de HTML.
 
+> **En curso:** se está construyendo un **fotolog** (galería pública CC BY en 3 idiomas +
+> zona privada con subida desde móvil y S3). Plan, decisiones y estado por fases en
+> **`FOTOLOG-PLAN.md`** — léelo antes de trabajar en ello.
+
 > **Estado actual:** landing de una sola página (sin BD) en **tres idiomas**: español (por defecto, ruta `/`), inglés (`/en`) y ruso (`/ru`). Diseño minimalista **negro sobre blanco**, dos columnas: izquierda branding (monograma AZR, foto, nombre, claims, redes — GitHub, YouTube, LinkedIn, Credly, blog, email — y selector de idioma), derecha "Skills" con tono **sarcástico**.
 >
 > **i18n:** los textos viven en `internal/i18n/i18n.go` (mapa `Content` por idioma; para tocar copy se edita ahí, no la plantilla). El handler `Home` resuelve `{lang}` del path y renderiza `home.go.tmpl` con el `Content` del idioma; idioma no soportado → 404. La plantilla emite `canonical` + `hreflang` (x-default → español). Los enlaces sociales están hardcodeados en la plantilla, compartidos por los tres idiomas. **No usa la base de datos**: el CRUD de `pages` y los modelos existen en el código pero no están cableados a rutas.
