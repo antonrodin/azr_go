@@ -16,6 +16,31 @@
 <meta property="og:title" content="{{ .OgTitle }}" />
 <meta property="og:description" content="{{ .OgDescription }}" />
 <meta property="og:image" content="/public/img/azr.jpg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://azr.es/#person",
+  "name": {{ .PersonName }},
+  "alternateName": "AZR",
+  "url": "https://azr.es/",
+  "mainEntityOfPage": {{ printf "https://azr.es%s" .Path }},
+  "image": "https://azr.es/public/img/azr.jpg",
+  "jobTitle": {{ .JobTitle }},
+  "description": {{ .MetaDescription }},
+  "email": "mailto:azr@azr.es",
+  "knowsLanguage": ["es", "en", "ru"],
+  "knowsAbout": ["Go", "TypeScript", "JavaScript", "PHP", "DevOps", "Inteligencia artificial"],
+  "sameAs": [
+    "https://github.com/antonrodin",
+    "https://www.youtube.com/c/AZRMedia",
+    "https://www.linkedin.com/in/azrodin/",
+    "https://www.credly.com/users/anton-zekeriev-rodin",
+    "https://www.azrodin.com/"
+  ]
+}
+</script>
 {{ end }}
 
 {{ define "content" }}

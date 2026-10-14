@@ -58,6 +58,10 @@ type Content struct {
 	// Enlace al fotolog (nav de la home)
 	FotologNav string
 	FotologURL string
+
+	// Datos estructurados (JSON-LD Person)
+	PersonName string
+	JobTitle   string
 }
 
 var content = map[string]Content{
@@ -95,6 +99,8 @@ var content = map[string]Content{
 		ColophonPost:    ". Ni una línea escrita a mano, y mira qué legible ha quedado.",
 		FotologNav:      "Fotolog",
 		FotologURL:      "/fotolog",
+		PersonName:      "Antón Zekeriev Rodin",
+		JobTitle:        "Ingeniero del Software",
 	},
 	"en": {
 		Lang: "en", Path: "/en",
@@ -130,6 +136,8 @@ var content = map[string]Content{
 		ColophonPost:    ". Not a single line written by hand, and look how readable it turned out.",
 		FotologNav:      "Photolog",
 		FotologURL:      "/en/fotolog",
+		PersonName:      "Antón Zekeriev Rodin",
+		JobTitle:        "Software Engineer",
 	},
 	"ru": {
 		Lang: "ru", Path: "/ru",
@@ -165,6 +173,8 @@ var content = map[string]Content{
 		ColophonPost:    ". Ни строчки вручную — и посмотрите, как читабельно получилось.",
 		FotologNav:      "Фотолог",
 		FotologURL:      "/ru/fotolog",
+		PersonName:      "Антон Зекериев Родин",
+		JobTitle:        "Инженер-программист",
 	},
 }
 
