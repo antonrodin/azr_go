@@ -150,9 +150,8 @@ Notas de implementación (para fases 3-4):
   Motivo: local y prod tienen BDs SQLite independientes, así que los IDs pueden
   colisionar y un test local sobrescribiría ficheros de producción. NO apuntes el .env
   local a `azr-fotolog`.
-- **Sesiones en memoria**: `scs` sin store persistente → cada `supervisorctl restart`
-  cierra la sesión y hay que volver a hacer login (aunque el Lifetime sea 30 días).
-  Mejora opcional futura: `scs/sqlite3store` sobre la misma BD.
+- **Sesiones persistentes** (2026-10-14): `scs/sqlite3store` sobre la misma BD (tabla
+  `sessions`), así que un `supervisorctl restart` ya no cierra la sesión.
 - **Anton ya subió una foto real en prod** (id 1, privada, sin título en `~/www/azr`).
   Para publicarla necesita título en español desde `/admin/fotos/1`.
 

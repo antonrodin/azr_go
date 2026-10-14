@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
@@ -10,7 +9,6 @@ import (
 	"github.com/antonrodin/azr/internal/models/mysqlite"
 	"github.com/antonrodin/azr/internal/openai"
 	"github.com/antonrodin/azr/internal/photos"
-	"github.com/antonrodin/azr/internal/tmpl"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -82,39 +80,17 @@ func (app *AppRepository) Home(w http.ResponseWriter, r *http.Request) {
 		Brand:   makeBrand(c, "/", "/en", "/ru", false),
 	}
 
-	err := tmpl.Get("home.go.tmpl").Execute(w, data)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	app.render(w, "home.go.tmpl", data)
 }
 
 func (app *AppRepository) Contacto(w http.ResponseWriter, r *http.Request) {
-
-	err := tmpl.Get("contacto/contacto.go.tmpl").Execute(w, nil)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	app.render(w, "contacto/contacto.go.tmpl", nil)
 }
 
 func (app *AppRepository) Cookies(w http.ResponseWriter, r *http.Request) {
-
-	err := tmpl.Get("contacto/cookies.go.tmpl").Execute(w, nil)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	app.render(w, "contacto/cookies.go.tmpl", nil)
 }
 
 func (app *AppRepository) Legal(w http.ResponseWriter, r *http.Request) {
-
-	err := tmpl.Get("contacto/legal.go.tmpl").Execute(w, nil)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), 500)
-		return
-	}
+	app.render(w, "contacto/legal.go.tmpl", nil)
 }

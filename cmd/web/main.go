@@ -9,12 +9,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
 	"github.com/antonrodin/azr/internal/authsvc"
 	"github.com/antonrodin/azr/internal/handlers"
 	"github.com/antonrodin/azr/internal/models/mysqlite"
 	"github.com/antonrodin/azr/internal/openai"
 	"github.com/antonrodin/azr/internal/photos"
+	"github.com/antonrodin/azr/internal/tmpl"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -59,16 +61,6 @@ func run() error {
 		return fmt.Errorf("falta AUTH_SERVICE en .env")
 	}
 
-	log.Println("Initialize sessions")
-	session = scs.New()
-	// Sesión larga: la principal usuaria es la subida de fotos desde el
-	// móvil y no apetece meter la contraseña cada día.
-	session.Lifetime = 30 * 24 * time.Hour
-	session.Cookie.Persist = true
-	session.Cookie.SameSite = http.SameSiteLaxMode
-	session.Cookie.Secure = env == "prod"
-	session.Cookie.HttpOnly = true
-
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		return err
@@ -76,6 +68,31 @@ func run() error {
 
 	defer db.Close()
 	log.Println("Connected to SQLite successfully.")
+
+	// Plantillas cacheadas en prod; en dev se reparsean en cada petición.
+	tmpl.Cache = env == "prod"
+
+	// Sesiones en SQLite (misma BD) para que sobrevivan a los reinicios de
+	// supervisor y no haya que volver a hacer login tras cada despliegue.
+	if _, err := db.Exec(`CREATE TABLE IF NOT EXISTS sessions (
+		token TEXT PRIMARY KEY,
+		data BLOB NOT NULL,
+		expiry REAL NOT NULL
+	);
+	CREATE INDEX IF NOT EXISTS sessions_expiry_idx ON sessions(expiry);`); err != nil {
+		return fmt.Errorf("crear tabla sessions: %w", err)
+	}
+
+	log.Println("Initialize sessions")
+	session = scs.New()
+	session.Store = sqlite3store.New(db)
+	// Sesión larga: la principal usuaria es la subida de fotos desde el
+	// móvil y no apetece meter la contraseña cada día.
+	session.Lifetime = 30 * 24 * time.Hour
+	session.Cookie.Persist = true
+	session.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Secure = env == "prod"
+	session.Cookie.HttpOnly = true
 
 	photoModel := &mysqlite.PhotoModel{DB: db}
 	if err := photoModel.EnsureSchema(); err != nil {
@@ -123,8 +140,13 @@ func run() error {
 	handlers.NewRepo(&appRepo)
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%s", port),
-		Handler: app.routes(),
+		Addr:              fmt.Sprintf(":%s", port),
+		Handler:           app.routes(),
+		ReadHeaderTimeout: 10 * time.Second,
+		// Generoso: subidas de fotos/audio desde el móvil con mala cobertura.
+		ReadTimeout:  5 * time.Minute,
+		WriteTimeout: 5 * time.Minute,
+		IdleTimeout:  2 * time.Minute,
 	}
 
 	log.Printf("Server is running on http://localhost:%s \n", port)

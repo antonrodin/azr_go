@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -62,11 +63,22 @@ func (app *AppRepository) photoURL(r *http.Request, p *models.Photo, name string
 	return u
 }
 
+// render pinta la plantilla en un buffer y solo escribe si todo fue bien, para
+// no mandar media página seguida de un 500.
 func (app *AppRepository) render(w http.ResponseWriter, name string, data interface{}) {
-	if err := tmpl.Get(name).Execute(w, data); err != nil {
-		log.Println("render", name+":", err)
-		http.Error(w, err.Error(), 500)
+	t, err := tmpl.Get(name)
+	if err != nil {
+		log.Println("parse", name+":", err)
+		http.Error(w, "Error interno", http.StatusInternalServerError)
+		return
 	}
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, data); err != nil {
+		log.Println("render", name+":", err)
+		http.Error(w, "Error interno", http.StatusInternalServerError)
+		return
+	}
+	buf.WriteTo(w)
 }
 
 // --- Login / Logout ---
@@ -115,10 +127,11 @@ func (app *AppRepository) LoginPost(w http.ResponseWriter, r *http.Request) {
 }
 
 // safeNext valida el destino post-login: solo rutas internas de este sitio.
-// Rechaza URLs absolutas y protocol-relative ("//host") para evitar
+// Rechaza URLs absolutas y protocol-relative ("//host", "/\\host") para evitar
 // redirecciones abiertas a sitios externos. Por defecto, el listado de fotos.
 func safeNext(next string) string {
-	if strings.HasPrefix(next, "/") && !strings.HasPrefix(next, "//") {
+	// "/\host" también cuenta: los navegadores tratan "\" como "/".
+	if strings.HasPrefix(next, "/") && !strings.HasPrefix(next, "//") && !strings.HasPrefix(next, "/\\") {
 		return next
 	}
 	return "/admin/fotos"
