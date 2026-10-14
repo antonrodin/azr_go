@@ -368,6 +368,20 @@ func (app *AppRepository) Sitemap(w http.ResponseWriter, r *http.Request) {
 		b.WriteString("  <url><loc>" + xmlEscape(siteBase+path) + "</loc></url>\n")
 	}
 
+	// Blog: listado y artículos en cada idioma.
+	posts := app.blogStore()
+	for _, lang := range []string{"es", "en", "ru"} {
+		b.WriteString("  <url><loc>" + xmlEscape(siteBase+blogIndexPath(lang)) + "</loc></url>\n")
+		for _, a := range posts.List(lang) {
+			b.WriteString("  <url><loc>" + xmlEscape(siteBase+articlePath(a)) + "</loc>")
+			b.WriteString("<lastmod>" + a.Date.Format("2006-01-02") + "</lastmod>")
+			if a.Image != "" {
+				b.WriteString("<image:image><image:loc>" + xmlEscape(siteBase+a.Image) + "</image:loc></image:image>")
+			}
+			b.WriteString("</url>\n")
+		}
+	}
+
 	// Cada foto pública, en los tres idiomas, con su imagen.
 	for _, p := range pics {
 		imgLoc := app.pubURL(p.ID, fotologImage)

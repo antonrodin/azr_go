@@ -1,0 +1,50 @@
+{{ template "app" . }}
+
+{{ define "metadata" }}
+<title>{{ .T.IndexTitle }}</title>
+<meta name="description" content="{{ .T.IndexDesc }}" />
+<meta name="robots" content="all" />
+
+<link rel="canonical" href="{{ .Canonical }}" />
+<link rel="alternate" hreflang="es" href="{{ .AltES }}" />
+<link rel="alternate" hreflang="en" href="{{ .AltEN }}" />
+<link rel="alternate" hreflang="ru" href="{{ .AltRU }}" />
+<link rel="alternate" hreflang="x-default" href="{{ .AltES }}" />
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content="{{ .Canonical }}" />
+<meta property="og:title" content="{{ .T.IndexTitle }}" />
+<meta property="og:description" content="{{ .T.IndexDesc }}" />
+{{ end }}
+
+{{ define "content" }}
+<main class="page">
+    <div class="grid">
+
+        <!-- Columna 1: Branding (igual que la portada) -->
+        {{ template "components/brand" .Brand }}
+
+        <!-- Columna 2: Artículos -->
+        <section class="blog-main">
+            <h2>{{ .T.IndexH1 }}</h2>
+            <p class="lead-note">{{ .T.IndexIntro }}</p>
+
+            {{ if not .Articles }}
+            <p class="blog-empty">{{ .T.Empty }}</p>
+            {{ else }}
+            <ul class="post-list">
+                {{ range .Articles }}
+                <li>
+                    <time datetime="{{ .DateISO }}">{{ .Date }}</time>
+                    <h3><a href="{{ .Href }}">{{ .Title }}</a></h3>
+                    {{ if .Description }}<p>{{ .Description }}</p>{{ end }}
+                    <a class="read-more" href="{{ .Href }}">{{ $.T.ReadMore }}</a>
+                </li>
+                {{ end }}
+            </ul>
+            {{ end }}
+        </section>
+
+    </div>
+</main>
+{{ end }}

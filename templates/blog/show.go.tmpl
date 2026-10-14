@@ -1,0 +1,62 @@
+{{ template "app" . }}
+
+{{ define "metadata" }}
+{{ with .Article }}
+<title>{{ .Title }} · azr.es</title>
+<meta name="description" content="{{ .Description }}" />
+{{ end }}
+<meta name="robots" content="all" />
+
+<link rel="canonical" href="{{ .Canonical }}" />
+{{ range .Alternates }}<link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Href }}" />
+{{ end }}{{ if .XDefault }}<link rel="alternate" hreflang="x-default" href="{{ .XDefault }}" />{{ end }}
+
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ .Canonical }}" />
+<meta property="og:title" content="{{ .Article.Title }}" />
+<meta property="og:description" content="{{ .Article.Description }}" />
+<meta property="og:image" content="{{ .OgImage }}" />
+<meta property="article:published_time" content="{{ .DateISO }}" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<script type="application/ld+json">{{ .JSONLD | safeJS }}</script>
+{{ end }}
+
+{{ define "content" }}
+<main class="page">
+    <div class="grid">
+
+        <!-- Columna 1: Branding (igual que la portada) -->
+        {{ template "components/brand" .Brand }}
+
+        <!-- Columna 2: Artículo -->
+        <article class="post">
+            <nav class="post-back"><a href="{{ .T.BasePath }}">{{ .T.Back }}</a></nav>
+
+            {{ with .Article }}
+            <header>
+                <h1>{{ .Title }}</h1>
+                <time datetime="{{ $.DateISO }}">{{ $.Date }}</time>
+            </header>
+
+            {{ if .Image }}
+            <figure class="post-cover">
+                <picture>
+                    <source type="image/webp" srcset="{{ .ImageWebP }}">
+                    <img src="{{ .Image }}" alt="{{ .ImageAlt }}" width="1200" height="630" loading="eager" fetchpriority="high">
+                </picture>
+                {{ if .ImageCredit }}<figcaption>{{ $.T.ImageBy }} {{ .ImageCredit }}</figcaption>{{ end }}
+            </figure>
+            {{ end }}
+
+            <div class="post-body">
+                {{ .Body }}
+            </div>
+            {{ end }}
+
+            <nav class="post-back post-back-end"><a href="{{ .T.BasePath }}">{{ .T.Back }}</a></nav>
+        </article>
+
+    </div>
+</main>
+{{ end }}

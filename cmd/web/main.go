@@ -12,6 +12,7 @@ import (
 	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
 	"github.com/antonrodin/azr/internal/authsvc"
+	"github.com/antonrodin/azr/internal/blog"
 	"github.com/antonrodin/azr/internal/handlers"
 	"github.com/antonrodin/azr/internal/models/mysqlite"
 	"github.com/antonrodin/azr/internal/openai"
@@ -123,6 +124,12 @@ func run() error {
 		log.Println("OpenAI client disabled (no OPENAI_API_KEY).")
 	}
 
+	posts, err := blog.Load(handlers.BlogDir)
+	if err != nil {
+		return fmt.Errorf("cargar blog: %w", err)
+	}
+	log.Println("Blog loaded.")
+
 	app := app{
 		Session: session,
 	}
@@ -135,6 +142,7 @@ func run() error {
 		Storage: storage,
 		Auth:    authsvc.New(authService, "azr"),
 		OpenAI:  oai,
+		Blog:    posts,
 	}
 
 	handlers.NewRepo(&appRepo)

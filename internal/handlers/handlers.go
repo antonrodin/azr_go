@@ -5,6 +5,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/antonrodin/azr/internal/authsvc"
+	"github.com/antonrodin/azr/internal/blog"
 	"github.com/antonrodin/azr/internal/i18n"
 	"github.com/antonrodin/azr/internal/models/mysqlite"
 	"github.com/antonrodin/azr/internal/openai"
@@ -22,6 +23,7 @@ type AppRepository struct {
 	Storage *photos.Storage
 	Auth    *authsvc.Client
 	OpenAI  *openai.Client
+	Blog    *blog.Store
 }
 
 func NewRepo(a *AppRepository) {

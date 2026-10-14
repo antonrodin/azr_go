@@ -29,6 +29,12 @@ func (app *app) routes() http.Handler {
 	router.Get("/{lang}/fotolog/pagina/{n}", handlers.App.Fotolog)
 	router.Get("/{lang}/fotolog/{slug}", handlers.App.FotologPhoto)
 
+	// Blog: siempre con idioma en la ruta. Sin idioma → español.
+	router.Get("/blog", handlers.App.RedirectBlog)
+	router.Get("/blog/{slug}", handlers.App.RedirectBlog)
+	router.Get("/{lang}/blog", handlers.App.BlogIndex)
+	router.Get("/{lang}/blog/{slug}", handlers.App.BlogArticle)
+
 	// Login contra el servicio auth
 	router.Get("/login", handlers.App.LoginForm)
 	router.Post("/login", handlers.App.LoginPost)

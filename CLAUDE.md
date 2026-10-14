@@ -9,6 +9,16 @@ Web personal de **azr.es** (sitio de Anton Zekeriev Rodin). Aplicación web en *
 > `/admin/prompts`). Plan, decisiones y **avisos de infra** (bucket dev vs prod, nginx
 > `client_max_body_size`) en **`FOTOLOG-PLAN.md`** — léelo antes de tocar el fotolog.
 
+> **Blog (en vivo desde 2026-10-14):** `/{lang}/blog` y `/{lang}/blog/{slug}` (idioma siempre
+> en la ruta; `/blog` y `/blog/{slug}` → 301 a `/es/…`). Sin BD ni admin: cada artículo es
+> `content/blog/<clave>.<idioma>.md` con frontmatter (`title`, `slug`, `description`, `date`
+> AAAA-MM-DD, `image` JPG con `.webp` hermano en `public/img/blog/`, `image_alt`,
+> `image_credit`). La `<clave>` une las traducciones (hreflang, conmutador); el slug es
+> propio de cada idioma. Markdown → HTML con goldmark (`internal/blog`). Se carga al
+> arrancar (en prod hay que reiniciar para ver un artículo nuevo; en dev se recarga en cada
+> petición). Textos de interfaz en `internal/i18n/blog.go`. Entra solo en el sitemap.
+> Primer artículo: `ckad` (experiencia CKAD).
+
 > **Portada:** landing de una sola página en **tres idiomas**: español (por defecto, ruta `/`), inglés (`/en`) y ruso (`/ru`). Diseño minimalista **negro sobre blanco**, dos columnas: izquierda branding (monograma AZR, foto, nombre, claims, redes — GitHub, YouTube, LinkedIn, Credly, blog, email — y selector de idioma), derecha "Skills" con tono **sarcástico**.
 >
 > **i18n:** los textos viven en `internal/i18n/i18n.go` (mapa `Content` por idioma; para tocar copy se edita ahí, no la plantilla). El handler `Home` resuelve `{lang}` del path y renderiza `home.go.tmpl` con el `Content` del idioma; idioma no soportado → 404. La plantilla emite `canonical` + `hreflang` (x-default → español). Los enlaces sociales están hardcodeados en la plantilla, compartidos por los tres idiomas. La portada lleva JSON-LD `Person` (`PersonName`/`JobTitle` en i18n) y `rel="me"` en los enlaces sociales. La portada no lee la BD; el fotolog sí (`photos`, `prompts`, `sessions`). El CRUD de `pages` existe en el código pero no está cableado a rutas.
@@ -37,6 +47,7 @@ Web personal de **azr.es** (sitio de Anton Zekeriev Rodin). Aplicación web en *
 - `internal/authsvc/` — cliente HTTP del servicio auth (login → JWT)
 - `internal/photos/` — EXIF, derivados con vips, subida a S3
 - `internal/openai/` — traducción y transcripción
+- `internal/blog/` — carga y renderiza los artículos de `content/blog/`
 - `internal/i18n/fotolog.go` — textos del fotolog
 - `internal/i18n/i18n.go` — struct `Content` y traducciones es/en/ru de toda la home (meta/SEO incluidos); `i18n.Get(lang)` y `i18n.Default = "es"`
 - `internal/models/` — `models.go` define `Page`; `mysqlite/` el acceso a datos
